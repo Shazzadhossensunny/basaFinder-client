@@ -1,3 +1,9 @@
+import RegisterForm from "@/components/forms/RegisterForm";
+
 export default function RegisterPage() {
-  return <div>Register Page</div>;
+  return (
+    <div className="h-screen w-screen flex justify-center items-center">
+      <RegisterForm />
+    </div>
+  );
 }
