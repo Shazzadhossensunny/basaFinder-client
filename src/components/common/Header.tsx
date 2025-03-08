@@ -1,3 +1,4 @@
+"use client";
 import React, { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -5,43 +6,48 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Menu, X } from "lucide-react";
 import { ModeToggle } from "./ModeToggle";
+import { useUser } from "@/context/UserContext";
+import { logout } from "@/services/AuthService";
 
 const Header = () => {
+  const { user, setIsLoading } = useUser();
   const pathname = usePathname();
-  // const dispatch = useAppDispatch();
-  // const { isAuthenticated, user } = useAppSelector((state) => state.auth);
+
   const [isOpen, setIsOpen] = useState(false);
 
   const handleLogout = () => {
-    // dispatch(logout());
+    logout();
     setIsOpen(false);
+    // if (protectedRoutes.some((route) => pathname.match(route))) {
+    //   router.push("/");
+    // }
   };
 
-  // const getDashboardPath = () => {
-  //   if (!user) return "/login";
+  const getDashboardPath = () => {
+    if (!user) return "/login";
 
-  //   switch (user.role) {
-  //     case "admin":
-  //       return "/admin";
-  //     case "landlord":
-  //       return "/landlord";
-  //     case "tenant":
-  //       return "/tenant";
-  //     default:
-  //       return "/";
-  //   }
-  // };
+    switch (user.role) {
+      case "admin":
+        return "/admin";
+      case "landlord":
+        return "/landlord";
+      case "tenant":
+        return "/tenant";
+      default:
+        return "/";
+    }
+  };
 
   const navItems = [
     { label: "Home", path: "/" },
     { label: "About Us", path: "/about" },
     { label: "All Listings", path: "/listings" },
-    // { label: "Dashboard", path: getDashboardPath() },
+    { label: "Dashboard", path: getDashboardPath() },
   ];
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur">
-      <div className="container flex h-16 items-center justify-between">
+      <div className="container mx-auto flex h-16 items-center justify-between">
         <div className="flex items-center">
           <Link href="/" className="flex items-center space-x-2">
             <span className="text-2xl font-bold text-primary">BasaFinder</span>
@@ -64,27 +70,27 @@ const Header = () => {
               {item.label}
             </Link>
           ))}
-          {/* {isAuthenticated ? ( */}
-          <>
-            <Link
-              href="/profile"
-              className={`text-sm font-medium transition-colors hover:text-primary ${
-                pathname === "/profile"
-                  ? "text-primary"
-                  : "text-muted-foreground"
-              }`}
-            >
-              My Profile
+          {user?.email ? (
+            <>
+              <Link
+                href="/profile"
+                className={`text-sm font-medium transition-colors hover:text-primary ${
+                  pathname === "/profile"
+                    ? "text-primary"
+                    : "text-muted-foreground"
+                }`}
+              >
+                My Profile
+              </Link>
+              <Button variant="outline" onClick={handleLogout}>
+                Logout
+              </Button>
+            </>
+          ) : (
+            <Link href="/login">
+              <Button>Login / Register</Button>
             </Link>
-            <Button variant="outline" onClick={handleLogout}>
-              Logout
-            </Button>
-          </>
-          {/* ) : ( */}
-          <Link href="/login">
-            <Button>Login / Register</Button>
-          </Link>
-          {/* )} */}
+          )}
           <ModeToggle />
         </nav>
 
@@ -114,28 +120,28 @@ const Header = () => {
                     {item.label}
                   </Link>
                 ))}
-                {/* {isAuthenticated ? ( */}
-                <>
-                  <Link
-                    href="/profile"
-                    onClick={() => setIsOpen(false)}
-                    className={`text-sm font-medium transition-colors hover:text-primary ${
-                      pathname === "/profile"
-                        ? "text-primary"
-                        : "text-muted-foreground"
-                    }`}
-                  >
-                    My Profile
+                {user?.email ? (
+                  <>
+                    <Link
+                      href="/profile"
+                      onClick={() => setIsOpen(false)}
+                      className={`text-sm font-medium transition-colors hover:text-primary ${
+                        pathname === "/profile"
+                          ? "text-primary"
+                          : "text-muted-foreground"
+                      }`}
+                    >
+                      My Profile
+                    </Link>
+                    <Button variant="outline" onClick={handleLogout}>
+                      Logout
+                    </Button>
+                  </>
+                ) : (
+                  <Link href="/login" onClick={() => setIsOpen(false)}>
+                    <Button>Login / Register</Button>
                   </Link>
-                  <Button variant="outline" onClick={handleLogout}>
-                    Logout
-                  </Button>
-                </>
-                {/* // ) : ( */}
-                <Link href="/login" onClick={() => setIsOpen(false)}>
-                  <Button>Login / Register</Button>
-                </Link>
-                {/* // )} */}
+                )}
               </div>
             </SheetContent>
           </Sheet>

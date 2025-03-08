@@ -67,13 +67,13 @@ export function LoginForm() {
       }
 
       // Redirect based on user role
-      // if (result.user.role === "admin") {
-      //   router.push("/admin");
-      // } else if (result.user.role === "landlord") {
-      //   router.push("/landlord");
-      // } else {
-      //   router.push("/tenant");
-      // }
+      if (result?.user.role === "admin") {
+        router.push("/admin");
+      } else if (result.user.role === "landlord") {
+        router.push("/landlord");
+      } else {
+        router.push("/tenant");
+      }
     } catch (error) {
       toast.error("Login failed. Please check your credentials.");
     }
