@@ -47,7 +47,7 @@ export function LoginForm() {
     },
   });
 
-  const { setIsLoading } = useUser();
+  const { user, setIsLoading } = useUser();
   const searchParams = useSearchParams();
   const redirect = searchParams.get("redirectPath");
   const router = useRouter();
@@ -58,24 +58,31 @@ export function LoginForm() {
 
   const onSubmit: SubmitHandler<FieldValues> = async (data) => {
     try {
-      const result = await loginUser(data);
       setIsLoading(true);
+      const result = await loginUser(data);
+      console.log("Login API Response:", result); // Debugging
       if (result?.success) {
         toast.success(result?.message);
+        console.log("User Role:", user); // Debugging
+        // Redirect based on user role
+        const userRole = user?.role;
+        if (userRole === "admin") {
+          router.push("/admin");
+        } else if (userRole === "landlord") {
+          router.push("/landlord");
+        } else if (userRole === "tenant") {
+          router.push("/tenant");
+        } else {
+          router.push("/");
+        }
       } else {
-        toast.error(result?.message);
-      }
-
-      // Redirect based on user role
-      if (result?.user.role === "admin") {
-        router.push("/admin");
-      } else if (result.user.role === "landlord") {
-        router.push("/landlord");
-      } else {
-        router.push("/tenant");
+        toast.error(result?.message || "Login failed. Please try again.");
       }
     } catch (error) {
+      console.error("Login Error:", error);
       toast.error("Login failed. Please check your credentials.");
+    } finally {
+      setIsLoading(false);
     }
   };
 

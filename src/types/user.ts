@@ -1,11 +1,17 @@
+export enum UserRole {
+  ADMIN = "admin",
+  LANDLORD = "landlord",
+  TENANT = "tenant",
+}
+
 export interface IUser {
-  userId: string;
+  _id: string;
   name: string;
   email: string;
   phoneNumber: string;
-  isActive: boolean;
-  role: "landlord" | "tenant" | "admin";
-  deactivatedAt: string | null;
+  isActive?: boolean;
+  role: UserRole;
+  deactivatedAt?: string | null;
   iat?: number;
   exp?: number;
   createdAt: string;

@@ -1,5 +1,6 @@
 import Footer from "@/components/common/Footer";
 import Header from "@/components/common/Header";
+import Navbar from "@/components/common/Navbar";
 
 export default function CommonLayout({
   children,
@@ -8,7 +9,8 @@ export default function CommonLayout({
 }) {
   return (
     <>
-      <Header />
+      {/* <Header /> */}
+      <Navbar />
       <main className="min-h-screen">{children}</main>
       <Footer />
     </>
