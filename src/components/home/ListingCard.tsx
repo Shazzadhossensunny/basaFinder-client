@@ -10,13 +10,13 @@ interface ListingCardProps {
     images: string[];
     location: string;
     description: string;
-    rentAmount: number;
+    rent: number;
     bedrooms: number;
   };
 }
 
 const ListingCard = ({ listing }: ListingCardProps) => {
-  const { _id, images, location, description, rentAmount, bedrooms } = listing;
+  const { _id, images, location, description, rent, bedrooms } = listing;
 
   return (
     <Card className="overflow-hidden h-full flex flex-col transition-transform hover:scale-[1.02]">
@@ -40,9 +40,7 @@ const ListingCard = ({ listing }: ListingCardProps) => {
         <p className="text-gray-600 text-sm line-clamp-2 mb-3">{description}</p>
 
         <div className="flex justify-between items-center">
-          <p className="text-xl font-bold text-primary">
-            ৳{rentAmount.toLocaleString()}
-          </p>
+          <p className="text-xl font-bold text-primary">৳{rent}</p>
 
           <div className="flex items-center text-gray-500">
             <Bed size={16} className="mr-1" />

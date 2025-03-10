@@ -1,122 +1,197 @@
 "use client";
-import { useState } from "react";
-import Image from "next/image";
-import { MapPin, Bed, Bath, Home, Calendar, DollarSign } from "lucide-react";
-import { Dialog, DialogContent, DialogTrigger } from "../ui/dialog";
-import { Button } from "../ui/button";
+import React from "react";
+import Link from "next/link";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
+import {
+  Pencil,
+  Trash2,
+  BedDouble,
+  MapPin,
+  Tag,
+  Check,
+  Calendar,
+} from "lucide-react";
+import { format } from "date-fns";
 
-interface ListingDetailsProps {
-  listing: {
-    _id: string;
-    images: string[];
-    location: string;
-    description: string;
-    rentAmount: number;
-    bedrooms: number;
-    createdAt: string;
-    landlord: {
-      name: string;
-    };
-  };
+interface Landlord {
+  name: string;
+  email: string;
+  phoneNumber: string;
 }
 
-const ListingDetails = ({ listing }: ListingDetailsProps) => {
-  const [selectedImage, setSelectedImage] = useState(listing.images[0]);
+interface Listing {
+  _id: string;
+  location: string;
+  description: string;
+  rent: number;
+  bedrooms: number;
+  images: string[];
+  landlordId: Landlord;
+  isAvailable: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+interface ListingDetailsProps {
+  listing: Listing;
+  isOwner: boolean;
+}
+
+const ListingDetails: React.FC<ListingDetailsProps> = ({
+  listing,
+  isOwner,
+}) => {
+  // Validate dates before formatting
+  const createdDate =
+    listing?.createdAt && !isNaN(new Date(listing.createdAt).getTime())
+      ? format(new Date(listing.createdAt), "MMMM d, yyyy")
+      : "N/A";
+
+  const updatedDate =
+    listing?.updatedAt && !isNaN(new Date(listing.updatedAt).getTime())
+      ? format(new Date(listing.updatedAt), "MMMM d, yyyy")
+      : "N/A";
 
   return (
-    <div className="bg-white rounded-lg shadow overflow-hidden">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-6">
+    <div className="space-y-6 max-w-4xl mx-auto p-4 md:p-6">
+      {/* Header */}
+      <div className="flex flex-col md:flex-row justify-between items-start">
         <div>
-          <div className="relative w-full h-80 rounded-lg overflow-hidden mb-4">
-            <Image
-              src={selectedImage || "/placeholder-house.jpg"}
-              alt={listing.location}
-              fill
-              className="object-cover"
-            />
-          </div>
-
-          <div className="grid grid-cols-4 gap-2">
-            {listing.images.slice(0, 4).map((image, index) => (
-              <button
-                key={index}
-                className={`relative h-20 rounded overflow-hidden border-2 ${
-                  selectedImage === image
-                    ? "border-primary"
-                    : "border-transparent"
-                }`}
-                onClick={() => setSelectedImage(image)}
-              >
-                <Image
-                  src={image}
-                  alt={`Thumbnail ${index + 1}`}
-                  fill
-                  className="object-cover"
-                />
-              </button>
-            ))}
-          </div>
-
-          <Dialog>
-            <DialogTrigger asChild>
-              <Button variant="ghost" className="mt-2 w-full">
-                View All Photos
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="max-w-4xl w-full">
-              {/* <ImageGallery  images={listing.images} /> */}
-            </DialogContent>
-          </Dialog>
-        </div>
-
-        <div>
-          <div className="flex items-center text-gray-500 mb-2">
+          <h1 className="text-2xl font-bold">{listing?.location}</h1>
+          <div className="flex items-center text-gray-600 mb-1">
             <MapPin size={16} className="mr-1" />
-            <p className="text-sm">{listing.location}</p>
+            <span>{listing?.location}</span>
           </div>
-
-          <h1 className="text-2xl font-bold mb-4">{listing.location}</h1>
-
-          <div className="flex flex-wrap gap-4 mb-6">
-            <div className="flex items-center">
-              <DollarSign size={20} className="text-primary mr-2" />
-              <div>
-                <p className="text-lg font-bold">
-                  ৳{listing.rentAmount.toLocaleString()}
-                </p>
-                <p className="text-xs text-gray-500">Per Month</p>
-              </div>
-            </div>
-
-            <div className="flex items-center">
-              <Bed size={20} className="text-primary mr-2" />
-              <div>
-                <p className="text-lg font-bold">{listing.bedrooms}</p>
-                <p className="text-xs text-gray-500">Bedrooms</p>
-              </div>
-            </div>
-
-            <div className="flex items-center">
-              <Calendar size={20} className="text-primary mr-2" />
-              <div>
-                <p className="text-sm">
-                  {new Date(listing.createdAt).toLocaleDateString()}
-                </p>
-                <p className="text-xs text-gray-500">Posted Date</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="mb-6">
-            <h2 className="text-lg font-semibold mb-2">Description</h2>
-            <p className="text-gray-700">{listing.description}</p>
-          </div>
-
-          <div className="p-4 bg-gray-50 rounded-lg">
-            <p className="text-sm text-gray-500">Listed by</p>
-            <p className="font-medium">{listing.landlord.name}</p>
+          <div className="flex items-center gap-2">
+            <Badge variant={listing?.isAvailable ? "default" : "destructive"}>
+              {listing?.isAvailable ? "Available" : "Not Available"}
+            </Badge>
+            <Badge variant="outline" className="flex items-center">
+              <BedDouble size={14} className="mr-1" />
+              {listing?.bedrooms}{" "}
+              {listing?.bedrooms === 1 ? "Bedroom" : "Bedrooms"}
+            </Badge>
           </div>
         </div>
+
+        <p className="text-3xl font-bold text-primary">
+          ${listing?.rent?.toLocaleString()}
+          <span className="text-base font-normal text-gray-500">/month</span>
+        </p>
+      </div>
+
+      {/* Edit/Delete Buttons */}
+      {isOwner && (
+        <div className="flex gap-2">
+          <Link href={`/listings/${listing?._id}/edit`} passHref>
+            <Button variant="outline" className="flex items-center gap-1">
+              <Pencil size={16} />
+              Edit Listing
+            </Button>
+          </Link>
+          <Button variant="destructive" className="flex items-center gap-1">
+            <Trash2 size={16} />
+            Delete
+          </Button>
+        </div>
+      )}
+
+      <Separator />
+
+      {/* Description */}
+      <div>
+        <h2 className="text-xl font-semibold mb-3">Description</h2>
+        <p className="text-gray-700 whitespace-pre-line">
+          {listing?.description}
+        </p>
+      </div>
+
+      <Separator />
+
+      {/* Property Details */}
+      <div>
+        <h2 className="text-xl font-semibold mb-3">Property Details</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <Card>
+            <CardContent className="flex items-center p-4 gap-3">
+              <div className="bg-blue-100 p-2 rounded-full">
+                <BedDouble size={24} className="text-blue-700" />
+              </div>
+              <div>
+                <p className="text-sm text-gray-500">Bedrooms</p>
+                <p className="font-medium">{listing?.bedrooms}</p>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardContent className="flex items-center p-4 gap-3">
+              <div className="bg-green-100 p-2 rounded-full">
+                <Tag size={24} className="text-green-700" />
+              </div>
+              <div>
+                <p className="text-sm text-gray-500">Rent</p>
+                <p className="font-medium">
+                  ${listing?.rent?.toLocaleString()}/month
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardContent className="flex items-center p-4 gap-3">
+              <div className="bg-purple-100 p-2 rounded-full">
+                <Check size={24} className="text-purple-700" />
+              </div>
+              <div>
+                <p className="text-sm text-gray-500">Availability</p>
+                <p className="font-medium">
+                  {listing?.isAvailable ? "Available Now" : "Not Available"}
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardContent className="flex items-center p-4 gap-3">
+              <div className="bg-amber-100 p-2 rounded-full">
+                <Calendar size={24} className="text-amber-700" />
+              </div>
+              <div>
+                <p className="text-sm text-gray-500">Listed On</p>
+                <p className="font-medium">{createdDate}</p>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+
+      <Separator />
+
+      {/* Contact Information */}
+      <div>
+        <h2 className="text-xl font-semibold mb-3">Contact Information</h2>
+        <Card>
+          <CardContent className="p-4">
+            <div className="space-y-2">
+              <p>
+                <span className="font-medium">Landlord:</span>{" "}
+                {listing?.landlordId?.name}
+              </p>
+              <p>
+                <span className="font-medium">Email:</span>{" "}
+                {listing?.landlordId?.email}
+              </p>
+              <p>
+                <span className="font-medium">Phone:</span>{" "}
+                {listing?.landlordId?.phoneNumber}
+              </p>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );

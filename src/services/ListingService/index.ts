@@ -22,7 +22,7 @@ export const getAllListings = async (
 
   try {
     const res = await fetch(
-      `${process.env.NEXT_PUBLIC_BASE_API}/listings?limit=${limit}&page=${page}&${params}`,
+      `${process.env.NEXT_PUBLIC_BASE_API}/listing?limit=${limit}&page=${page}&${params}`,
       {
         next: {
           tags: ["LISTINGS"],
