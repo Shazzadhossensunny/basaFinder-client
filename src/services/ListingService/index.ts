@@ -38,7 +38,7 @@ export const getAllListings = async (
 export const getListingById = async (listingId: string) => {
   try {
     const res = await fetch(
-      `${process.env.NEXT_PUBLIC_BASE_API}/listings/${listingId}`,
+      `${process.env.NEXT_PUBLIC_BASE_API}/listing/${listingId}`,
       {
         next: {
           tags: ["LISTINGS"],
@@ -53,7 +53,7 @@ export const getListingById = async (listingId: string) => {
 
 export const createListing = async (listingData: FormData) => {
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/listings`, {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/listing`, {
       method: "POST",
       body: listingData,
       headers: {
@@ -70,7 +70,7 @@ export const createListing = async (listingData: FormData) => {
 export const updateListing = async (id: string, listingData: FormData) => {
   try {
     const res = await fetch(
-      `${process.env.NEXT_PUBLIC_BASE_API}/listings/${id}`,
+      `${process.env.NEXT_PUBLIC_BASE_API}/listing/${id}`,
       {
         method: "PUT",
         body: listingData,
@@ -89,7 +89,7 @@ export const updateListing = async (id: string, listingData: FormData) => {
 export const deleteListing = async (id: string) => {
   try {
     const res = await fetch(
-      `${process.env.NEXT_PUBLIC_BASE_API}/listings/${id}`,
+      `${process.env.NEXT_PUBLIC_BASE_API}/listing/${id}`,
       {
         method: "DELETE",
         headers: {
@@ -107,7 +107,7 @@ export const deleteListing = async (id: string) => {
 export const getLandlordListings = async () => {
   try {
     const res = await fetch(
-      `${process.env.NEXT_PUBLIC_BASE_API}/listings/landlord/my-listings`,
+      `${process.env.NEXT_PUBLIC_BASE_API}/listing/landlord/my-listings`,
       {
         next: {
           tags: ["LISTINGS"],

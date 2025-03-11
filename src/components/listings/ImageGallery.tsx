@@ -2,9 +2,10 @@
 
 import React, { useState } from "react";
 import Image from "next/image";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, ArrowRight, X } from "lucide-react";
+import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 
 interface ImageGalleryProps {
   images: string[];
@@ -86,6 +87,9 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({ images }) => {
 
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
         <DialogContent className="max-w-4xl p-0 bg-black">
+          <VisuallyHidden>
+            <DialogTitle>Hidden Title</DialogTitle>
+          </VisuallyHidden>
           <Button
             variant="ghost"
             className="absolute right-2 top-2 text-white z-10 p-2"
