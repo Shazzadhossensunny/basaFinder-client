@@ -1,18 +1,18 @@
 // app/listings/page.tsx
 import { Suspense } from "react";
-
 import { Skeleton } from "@/components/ui/skeleton";
 import { getAllListings } from "@/services/ListingService";
 import ListingFilters from "@/components/listings/ListingFiltersComponent";
 import ListingGrid from "@/components/common/ListingCard";
+import Pagination from "@/components/common/Pagination";
 
 export default async function ListingsPage({
   searchParams,
 }: {
-  searchParams: { [key: string]: string | string[] | undefined };
+  searchParams: Promise<{ page: string }>;
 }) {
-  const page = searchParams.page?.toString() || "1";
-  const limit = searchParams.limit?.toString() || "12";
+  const { page } = await searchParams;
+  // const limit = (await searchParams?.limit?.toString()) || "12";
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -27,11 +27,7 @@ export default async function ListingsPage({
         {/* Listings Grid */}
         <div className="lg:col-span-3">
           <Suspense fallback={<ListingsLoadingSkeleton />}>
-            <ListingsContent
-              page={page}
-              limit={limit}
-              searchParams={searchParams}
-            />
+            <ListingsContent page={page} />
           </Suspense>
         </div>
       </div>
@@ -39,18 +35,11 @@ export default async function ListingsPage({
   );
 }
 
-async function ListingsContent({
-  page,
-  limit,
-  searchParams,
-}: {
-  page: string;
-  limit: string;
-  searchParams: { [key: string]: string | string[] | undefined };
-}) {
-  const response = await getAllListings(page, limit, searchParams);
+async function ListingsContent({ page }: { page: string }) {
+  const { data, meta } = await getAllListings(page, "3");
 
-  if (!response.success) {
+  if (data.success) {
+    //! here is some issue console.log(data.success);
     return (
       <div className="bg-red-50 border border-red-200 text-red-700 p-4 rounded-md">
         Error loading listings. Please try again later.
@@ -58,7 +47,8 @@ async function ListingsContent({
     );
   }
 
-  const { data, pagination } = response;
+  // const { data, meta } = response;
+  console.log(meta);
 
   if (data.length === 0) {
     return (
@@ -72,11 +62,12 @@ async function ListingsContent({
   return (
     <>
       <p className="text-gray-600 mb-4">
-        Showing {data.length} of {pagination?.total} listings
+        Showing {data.length} of {meta.total} listings
       </p>
       <ListingGrid listings={data} />
 
-      {/* Pagination could be added here */}
+      {/* Pagination Component */}
+      <Pagination totalPage={meta?.totalPage} />
     </>
   );
 }

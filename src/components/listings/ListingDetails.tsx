@@ -1,3 +1,4 @@
+// components/listings/ListingDetails.tsx
 "use client";
 
 import React, { useState } from "react";
@@ -19,7 +20,11 @@ import {
 import { format } from "date-fns";
 import ImageGallery from "./ImageGallery";
 
+import { useUser } from "@/context/UserContext";
+import RentalRequestModal from "../forms/RentalRequestForm";
+
 interface Landlord {
+  _id: string;
   name: string;
   email: string;
   phoneNumber: string;
@@ -40,24 +45,34 @@ interface Listing {
 
 interface ListingDetailsProps {
   listing: Listing;
-  isOwner: boolean;
 }
 
-const ListingDetails: React.FC<ListingDetailsProps> = ({
-  listing,
-  isOwner,
-}) => {
+const ListingDetails: React.FC<ListingDetailsProps> = ({ listing }) => {
   const [isDeleting, setIsDeleting] = useState(false);
+  const { user } = useUser();
+
+  // Check if current user is the owner of this listing
+  const isOwner = user?._id === listing.landlordId._id;
+  // Check if user is a tenant (not owner and not admin)
+  const isTenant = user && user.role === "tenant";
 
   const createdDate = listing?.createdAt
     ? format(new Date(listing.createdAt), "MMMM d, yyyy")
     : "N/A";
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
     if (confirm("Are you sure you want to delete this listing?")) {
       setIsDeleting(true);
-      // Call delete API (Replace with actual API call)
-      console.log("Deleting listing...", listing._id);
+      try {
+        // Call delete API (Replace with actual API call)
+        // const response = await deleteListingById(listing._id);
+        console.log("Deleting listing...", listing._id);
+        // Redirect to listings page after successful deletion
+        // if (response.success) window.location.href = "/listings";
+      } catch (error) {
+        console.error("Error deleting listing:", error);
+        setIsDeleting(false);
+      }
     }
   };
 
@@ -112,8 +127,21 @@ const ListingDetails: React.FC<ListingDetailsProps> = ({
       )}
 
       {/* Tenant Actions */}
-      {!isOwner && listing.isAvailable && (
-        <Button className="w-full mt-4">Request Rental</Button>
+      {isTenant && listing.isAvailable && (
+        <RentalRequestModal listingId={listing._id} />
+      )}
+
+      {/* Guest/Not Logged In Message */}
+      {!user && listing.isAvailable && (
+        <div className="bg-blue-50 border border-blue-200 text-blue-700 p-4 rounded-md">
+          <p>
+            Please{" "}
+            <Link href="/login" className="underline font-medium">
+              log in
+            </Link>{" "}
+            to request this rental property.
+          </p>
+        </div>
       )}
 
       <Separator />
@@ -187,10 +215,13 @@ const ListingDetails: React.FC<ListingDetailsProps> = ({
               <span className="font-medium">Email:</span>{" "}
               {listing.landlordId.email}
             </p>
-            <p>
-              <span className="font-medium">Phone:</span>{" "}
-              {listing.landlordId.phoneNumber}
-            </p>
+            {/* Only show phone number to approved tenants or after payment */}
+            {isOwner && (
+              <p>
+                <span className="font-medium">Phone:</span>{" "}
+                {listing.landlordId.phoneNumber}
+              </p>
+            )}
           </CardContent>
         </Card>
       </div>

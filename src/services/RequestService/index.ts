@@ -1,18 +1,29 @@
 "use server";
+import { getValidToken } from "@/lib/verifyToken";
 import { revalidateTag } from "next/cache";
 import { cookies } from "next/headers";
-
-export const createRequest = async (requestData: FormData) => {
+interface RequestData {
+  listingId: string;
+  tenantId: string;
+  message: string;
+}
+export const createRequest = async (requestData: RequestData) => {
+  const token = await getValidToken();
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/requests`, {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/request`, {
       method: "POST",
-      body: requestData,
       headers: {
-        Authorization: (await cookies()).get("accessToken")!.value,
+        "Content-Type": "application/json",
+        Authorization: token,
       },
+      body: JSON.stringify(requestData),
     });
+    if (!res.ok) {
+      const errorData = await res.json();
+      throw new Error(errorData.message || "Failed to create request");
+    }
     revalidateTag("REQUESTS");
-    return res.json();
+    return await res.json();
   } catch (error: any) {
     return Error(error.message);
   }
@@ -21,7 +32,7 @@ export const createRequest = async (requestData: FormData) => {
 export const getTenantRequests = async () => {
   try {
     const res = await fetch(
-      `${process.env.NEXT_PUBLIC_BASE_API}/requests/tenant`,
+      `${process.env.NEXT_PUBLIC_BASE_API}/request/tenant`,
       {
         next: {
           tags: ["REQUESTS"],
@@ -40,7 +51,7 @@ export const getTenantRequests = async () => {
 export const getLandlordRequests = async () => {
   try {
     const res = await fetch(
-      `${process.env.NEXT_PUBLIC_BASE_API}/requests/landlord`,
+      `${process.env.NEXT_PUBLIC_BASE_API}/request/landlord`,
       {
         next: {
           tags: ["REQUESTS"],
@@ -59,7 +70,7 @@ export const getLandlordRequests = async () => {
 export const getRequestById = async (id: string) => {
   try {
     const res = await fetch(
-      `${process.env.NEXT_PUBLIC_BASE_API}/requests/${id}`,
+      `${process.env.NEXT_PUBLIC_BASE_API}/request/${id}`,
       {
         next: {
           tags: ["REQUESTS"],
@@ -82,7 +93,7 @@ export const updateRequestStatus = async (
 ) => {
   try {
     const res = await fetch(
-      `${process.env.NEXT_PUBLIC_BASE_API}/requests/${id}/status`,
+      `${process.env.NEXT_PUBLIC_BASE_API}/request/${id}/status`,
       {
         method: "PATCH",
         body: JSON.stringify({ status, phoneNumber }),
@@ -102,7 +113,7 @@ export const updateRequestStatus = async (
 export const initiateRequestPayment = async (requestId: string) => {
   try {
     const res = await fetch(
-      `${process.env.NEXT_PUBLIC_BASE_API}/requests/${requestId}/payment`,
+      `${process.env.NEXT_PUBLIC_BASE_API}/request/${requestId}/payment`,
       {
         method: "POST",
         headers: {
@@ -120,7 +131,7 @@ export const initiateRequestPayment = async (requestId: string) => {
 export const updatePaymentStatus = async (id: string, paymentData: any) => {
   try {
     const res = await fetch(
-      `${process.env.NEXT_PUBLIC_BASE_API}/requests/${id}/payment`,
+      `${process.env.NEXT_PUBLIC_BASE_API}/request/${id}/payment`,
       {
         method: "PATCH",
         body: JSON.stringify(paymentData),

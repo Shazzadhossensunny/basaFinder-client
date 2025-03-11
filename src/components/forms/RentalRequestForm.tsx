@@ -1,117 +1,123 @@
+// components/listings/RentalRequestModal.tsx
 "use client";
 
-import React, { useState } from "react";
-import { useRouter } from "next/navigation";
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { Textarea } from "@/components/ui/textarea";
-import { createRequest } from "@/services/RequestService";
 import { toast } from "sonner";
-import ReactDatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
+import { createRequest } from "@/services/RequestService";
+import { useUser } from "@/context/UserContext";
 
-interface RentalRequestFormProps {
+// ✅ Zod Schema for Form Validation
+const rentalRequestSchema = z.object({
+  message: z.string().min(5, "Message must be at least 5 characters long."),
+});
+
+interface RentalRequestModalProps {
   listingId: string;
 }
 
-const RentalRequestForm: React.FC<RentalRequestFormProps> = ({ listingId }) => {
-  const router = useRouter();
+const RentalRequestModal: React.FC<RentalRequestModalProps> = ({
+  listingId,
+}) => {
+  const [isOpen, setIsOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [moveInDate, setMoveInDate] = useState<Date | null>(
-    new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // Default to 1 week from now
-  );
-  const [note, setNote] = useState("");
+  const { user } = useUser(); // Get logged-in user data
+  const tenantId = user?.userId; // Ensure tenantId is dynamically retrieved
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const form = useForm({
+    resolver: zodResolver(rentalRequestSchema),
+    defaultValues: { message: "" },
+  });
 
-    if (!moveInDate) {
-      toast.error("Please select a move-in date");
+  const onSubmit = async (data: { message: string }) => {
+    if (!tenantId) {
+      toast.error("You need to be logged in to submit a request.");
       return;
     }
 
     setIsSubmitting(true);
-
     try {
-      const formData = new FormData();
-      formData.append("listingId", listingId);
-      formData.append("moveInDate", moveInDate.toISOString());
-      if (note) formData.append("note", note);
-
-      const response = await createRequest(formData);
+      const payload = { listingId, tenantId, message: data.message };
+      console.log("payload", payload);
+      const response = await createRequest(payload);
 
       if (response.success) {
-        toast.success("Rental request submitted successfully!");
-        router.push("/dashboard/requests");
+        toast.success("Request Submitted", {
+          description: "Your rental request has been sent.",
+        });
+        setIsOpen(false);
+        form.reset();
       } else {
-        toast.error(response.message || "Failed to submit request");
+        toast.error("Submission Failed", {
+          description: response.message || "Please try again.",
+        });
       }
     } catch (error) {
-      toast.error("An error occurred. Please try again.");
-      console.error(error);
+      toast.error("Error", {
+        description: "Something went wrong. Please try again later.",
+      });
     } finally {
       setIsSubmitting(false);
     }
   };
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="text-xl">Request This Property</CardTitle>
-      </CardHeader>
-
-      <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="moveInDate">Preferred Move-in Date</Label>
-            <div className="border rounded-md">
-              <ReactDatePicker
-                id="moveInDate"
-                selected={moveInDate}
-                onChange={(date) => setMoveInDate(date)}
-                minDate={new Date()}
-                className="w-full p-2 rounded-md focus:outline-none"
-                dateFormat="MMMM d, yyyy"
-                placeholderText="Select a date"
-                required
-              />
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="note">Additional Notes (Optional)</Label>
-            <Textarea
-              id="note"
-              placeholder="Share any special requirements or questions you have..."
-              value={note}
-              onChange={(e) => setNote(e.target.value)}
-              rows={4}
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+      <DialogTrigger asChild>
+        <Button className="w-full">Request Rental</Button>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-[500px]">
+        <DialogHeader>
+          <DialogTitle>Request to Rent</DialogTitle>
+        </DialogHeader>
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            {/* Message Input */}
+            <FormField
+              control={form.control}
+              name="message"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Message to Landlord</FormLabel>
+                  <FormControl>
+                    <Textarea
+                      placeholder="Introduce yourself and why you're interested in this property"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
-          </div>
 
-          <Button
-            type="submit"
-            className="w-full"
-            disabled={isSubmitting || !moveInDate}
-          >
-            {isSubmitting ? "Submitting..." : "Submit Rental Request"}
-          </Button>
-        </form>
-      </CardContent>
-
-      <CardFooter className="border-t text-sm text-gray-500 pt-4 pb-4 flex justify-center">
-        The landlord will be notified of your request
-      </CardFooter>
-    </Card>
+            {/* Submit Button */}
+            <Button type="submit" disabled={isSubmitting} className="w-full">
+              {isSubmitting ? "Submitting..." : "Submit Request"}
+            </Button>
+          </form>
+        </Form>
+      </DialogContent>
+    </Dialog>
   );
 };
 
-export default RentalRequestForm;
+export default RentalRequestModal;
