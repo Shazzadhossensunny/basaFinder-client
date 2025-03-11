@@ -1,4 +1,5 @@
 "use server";
+import { getValidToken } from "@/lib/verifyToken";
 import { revalidateTag } from "next/cache";
 import { cookies } from "next/headers";
 
@@ -87,13 +88,14 @@ export const updateListing = async (id: string, listingData: FormData) => {
 };
 
 export const deleteListing = async (id: string) => {
+  const token = await getValidToken();
   try {
     const res = await fetch(
       `${process.env.NEXT_PUBLIC_BASE_API}/listing/${id}`,
       {
         method: "DELETE",
         headers: {
-          Authorization: (await cookies()).get("accessToken")!.value,
+          Authorization: token,
         },
       }
     );

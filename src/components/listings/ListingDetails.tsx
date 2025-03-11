@@ -16,12 +16,15 @@ import {
   Tag,
   Check,
   Calendar,
+  X,
 } from "lucide-react";
 import { format } from "date-fns";
 import ImageGallery from "./ImageGallery";
 
 import { useUser } from "@/context/UserContext";
 import RentalRequestModal from "../forms/RentalRequestForm";
+import { deleteListing } from "@/services/ListingService";
+import { toast } from "sonner";
 
 interface Landlord {
   _id: string;
@@ -61,18 +64,28 @@ const ListingDetails: React.FC<ListingDetailsProps> = ({ listing }) => {
     : "N/A";
 
   const handleDelete = async () => {
-    if (confirm("Are you sure you want to delete this listing?")) {
+    toast("Are you sure you want to permanently delete this listing?", {
+      action: {
+        label: "Undo",
+        onClick: () => console.log("Undo"),
+      },
+    });
+
+    try {
       setIsDeleting(true);
-      try {
-        // Call delete API (Replace with actual API call)
-        // const response = await deleteListingById(listing._id);
-        console.log("Deleting listing...", listing._id);
-        // Redirect to listings page after successful deletion
-        // if (response.success) window.location.href = "/listings";
-      } catch (error) {
-        console.error("Error deleting listing:", error);
-        setIsDeleting(false);
+      const response = await deleteListing(listing._id);
+      if (response.success) {
+        setTimeout(() => {
+          window.location.href = "/listings";
+        }, 2000);
+        toast.success("Listing deleted successfully");
+      } else {
+        toast.error(response.message);
       }
+    } catch (error: any) {
+      toast.error(error);
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -120,8 +133,14 @@ const ListingDetails: React.FC<ListingDetailsProps> = ({ listing }) => {
             className="flex items-center gap-1"
             onClick={handleDelete}
             disabled={isDeleting}
+            aria-label={isDeleting ? "Deleting listing" : "Delete listing"}
           >
-            <Trash2 size={16} /> {isDeleting ? "Deleting..." : "Delete"}
+            <Trash2 size={16} />
+            {isDeleting ? (
+              <span className="animate-pulse">Deleting...</span>
+            ) : (
+              "Delete"
+            )}
           </Button>
         </div>
       )}
