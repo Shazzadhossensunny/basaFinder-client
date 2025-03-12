@@ -52,15 +52,21 @@ export const getListingById = async (listingId: string) => {
   }
 };
 
-export const createListing = async (listingData: FormData) => {
+export const createListing = async (listingData: any) => {
+  const token = await getValidToken();
   try {
     const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/listing`, {
       method: "POST",
-      body: listingData,
       headers: {
-        Authorization: (await cookies()).get("accessToken")!.value,
+        "Content-Type": "application/json",
+        Authorization: token,
       },
+      body: JSON.stringify(listingData),
     });
+    if (!res.ok) {
+      const errorData = await res.json();
+      throw new Error(errorData.message || "Failed to create listing");
+    }
     revalidateTag("LISTINGS");
     return res.json();
   } catch (error: any) {

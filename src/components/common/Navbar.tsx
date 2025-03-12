@@ -3,7 +3,7 @@ import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
-import { Menu, X, User, LogOut } from "lucide-react";
+import { Menu, X, User, LogOut, Home, PlusCircle } from "lucide-react";
 import { useUser } from "@/context/UserContext";
 import { logout } from "@/services/AuthService";
 import { Button } from "@/components/ui/button";
@@ -43,12 +43,22 @@ const Navbar = () => {
     }
   };
 
-  const navItems = [
+  // Define base nav items
+  const baseNavItems = [
     { label: "Home", path: "/" },
     { label: "About Us", path: "/about" },
     { label: "Listings", path: "/listings" },
     { label: "Dashboard", path: getDashboardPath() },
   ];
+
+  // Add "Create Listing" for landlords
+  const navItems = [...baseNavItems];
+  if (user?.role === "landlord") {
+    navItems.push({
+      label: "Create Listing",
+      path: "/listings/create",
+    });
+  }
 
   return (
     <nav className="bg-white shadow-md sticky top-0 z-50">
