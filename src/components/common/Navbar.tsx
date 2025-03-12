@@ -20,11 +20,11 @@ const Navbar = () => {
   const getDashboardPath = () => {
     if (!user || !user?.role) return "/login";
     return user?.role === "admin"
-      ? "/admin/dashboard"
+      ? "/dashboard/admin"
       : user?.role === "landlord"
-      ? "/landlord/dashboard"
+      ? "/dashboard/landlord"
       : user?.role === "tenant"
-      ? "/tenant/dashboard"
+      ? "/dashboard/tenant"
       : "/";
   };
 
