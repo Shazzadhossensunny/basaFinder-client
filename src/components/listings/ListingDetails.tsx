@@ -1,30 +1,28 @@
-// components/listings/ListingDetails.tsx
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import Link from "next/link";
 
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import {
-  Pencil,
-  Trash2,
   BedDouble,
   MapPin,
   Tag,
   Check,
   Calendar,
-  X,
+  Wifi,
+  Wind,
+  Car,
+  Dumbbell,
+  WavesLadder,
 } from "lucide-react";
 import { format } from "date-fns";
 import ImageGallery from "./ImageGallery";
 
 import { useUser } from "@/context/UserContext";
 import RentalRequestModal from "../forms/RentalRequestForm";
-import { deleteListing } from "@/services/ListingService";
-import { toast } from "sonner";
 
 interface Landlord {
   _id: string;
@@ -40,6 +38,7 @@ interface Listing {
   rent: number;
   bedrooms: number;
   images: string[];
+  amenities: string[];
   landlordId: Landlord;
   isAvailable: boolean;
   createdAt: string;
@@ -50,44 +49,38 @@ interface ListingDetailsProps {
   listing: Listing;
 }
 
+// Helper function to get icon for amenity
+const getAmenityIcon = (amenity: string) => {
+  const amenityLower = amenity.toLowerCase();
+
+  if (amenityLower.includes("wifi")) return <Wifi size={20} />;
+  if (amenityLower.includes("air") || amenityLower.includes("conditioning"))
+    return <Wind size={20} />;
+  if (amenityLower.includes("parking")) return <Car size={20} />;
+  if (amenityLower.includes("gym")) return <Dumbbell size={20} />;
+  if (amenityLower.includes("pool") || amenityLower.includes("swimming"))
+    return <WavesLadder size={20} />;
+  return <Check size={20} />;
+};
+
 const ListingDetails: React.FC<ListingDetailsProps> = ({ listing }) => {
-  const [isDeleting, setIsDeleting] = useState(false);
   const { user } = useUser();
 
-  // Check if current user is the owner of this listing
-  const isOwner = user?._id === listing.landlordId._id;
-  // Check if user is a tenant (not owner and not admin)
-  const isTenant = user && user.role === "tenant";
+  // Check user roles and permissions
+  const isLandlord = user?.role === "landlord";
+  const isOwner = isLandlord && user?.userId === listing.landlordId._id;
+  const isTenant = user?.role === "tenant";
+
+  // Check for approved rental request status
+  // This will need to be implemented based on your API/backend
+  const hasRequestApproved = false; // Default to false until you implement this
 
   const createdDate = listing?.createdAt
     ? format(new Date(listing.createdAt), "MMMM d, yyyy")
     : "N/A";
 
-  const handleDelete = async () => {
-    toast("Are you sure you want to permanently delete this listing?", {
-      action: {
-        label: "Undo",
-        onClick: () => console.log("Undo"),
-      },
-    });
-
-    try {
-      setIsDeleting(true);
-      const response = await deleteListing(listing._id);
-      if (response.success) {
-        setTimeout(() => {
-          window.location.href = "/listings";
-        }, 2000);
-        toast.success("Listing deleted successfully");
-      } else {
-        toast.error(response.message);
-      }
-    } catch (error: any) {
-      toast.error(error);
-    } finally {
-      setIsDeleting(false);
-    }
-  };
+  // Determine if contact details should be shown
+  const showContactDetails = isOwner || (isTenant && hasRequestApproved);
 
   return (
     <div className="space-y-6 max-w-4xl mx-auto p-4 md:p-6">
@@ -120,31 +113,6 @@ const ListingDetails: React.FC<ListingDetailsProps> = ({ listing }) => {
       {/* Image Gallery */}
       <ImageGallery images={listing.images} />
 
-      {/* Owner Actions */}
-      {isOwner && (
-        <div className="flex gap-2">
-          <Link href={`/listings/${listing._id}/edit`} passHref>
-            <Button variant="outline" className="flex items-center gap-1">
-              <Pencil size={16} /> Edit Listing
-            </Button>
-          </Link>
-          <Button
-            variant="destructive"
-            className="flex items-center gap-1"
-            onClick={handleDelete}
-            disabled={isDeleting}
-            aria-label={isDeleting ? "Deleting listing" : "Delete listing"}
-          >
-            <Trash2 size={16} />
-            {isDeleting ? (
-              <span className="animate-pulse">Deleting...</span>
-            ) : (
-              "Delete"
-            )}
-          </Button>
-        </div>
-      )}
-
       {/* Tenant Actions */}
       {isTenant && listing.isAvailable && (
         <RentalRequestModal listingId={listing._id} />
@@ -175,48 +143,71 @@ const ListingDetails: React.FC<ListingDetailsProps> = ({ listing }) => {
 
       <Separator />
 
+      {/* Amenities Section */}
+      {listing.amenities?.length > 0 && (
+        <>
+          <div>
+            <h2 className="text-xl font-semibold mb-3">Amenities</h2>
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+              {listing.amenities.map((amenity, index) => (
+                <Card key={index}>
+                  <CardContent className="flex items-center p-4 gap-3">
+                    {getAmenityIcon(amenity)}
+                    <span className="font-medium">{amenity}</span>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+          <Separator />
+        </>
+      )}
+
       {/* Property Details */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <Card>
-          <CardContent className="flex items-center p-4 gap-3">
-            <BedDouble size={24} className="text-blue-700" />
-            <div>
-              <p className="text-sm text-gray-500">Bedrooms</p>
-              <p className="font-medium">{listing.bedrooms}</p>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="flex items-center p-4 gap-3">
-            <Tag size={24} className="text-green-700" />
-            <div>
-              <p className="text-sm text-gray-500">Rent</p>
-              <p className="font-medium">
-                ${listing.rent?.toLocaleString()}/month
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="flex items-center p-4 gap-3">
-            <Check size={24} className="text-purple-700" />
-            <div>
-              <p className="text-sm text-gray-500">Availability</p>
-              <p className="font-medium">
-                {listing.isAvailable ? "Available Now" : "Not Available"}
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="flex items-center p-4 gap-3">
-            <Calendar size={24} className="text-amber-700" />
-            <div>
-              <p className="text-sm text-gray-500">Listed On</p>
-              <p className="font-medium">{createdDate}</p>
-            </div>
-          </CardContent>
-        </Card>
+      <div>
+        <h2 className="text-xl font-semibold mb-3">Property Details</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <Card>
+            <CardContent className="flex items-center p-4 gap-3">
+              <BedDouble size={24} className="text-blue-700" />
+              <div>
+                <p className="text-sm text-gray-500">Bedrooms</p>
+                <p className="font-medium">{listing.bedrooms}</p>
+              </div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="flex items-center p-4 gap-3">
+              <Tag size={24} className="text-green-700" />
+              <div>
+                <p className="text-sm text-gray-500">Rent</p>
+                <p className="font-medium">
+                  ${listing.rent?.toLocaleString()}/month
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="flex items-center p-4 gap-3">
+              <Check size={24} className="text-purple-700" />
+              <div>
+                <p className="text-sm text-gray-500">Availability</p>
+                <p className="font-medium">
+                  {listing.isAvailable ? "Available Now" : "Not Available"}
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="flex items-center p-4 gap-3">
+              <Calendar size={24} className="text-amber-700" />
+              <div>
+                <p className="text-sm text-gray-500">Listed On</p>
+                <p className="font-medium">{createdDate}</p>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       </div>
 
       <Separator />
@@ -230,15 +221,26 @@ const ListingDetails: React.FC<ListingDetailsProps> = ({ listing }) => {
               <span className="font-medium">Landlord:</span>{" "}
               {listing.landlordId.name}
             </p>
-            <p>
-              <span className="font-medium">Email:</span>{" "}
-              {listing.landlordId.email}
-            </p>
-            {/* Only show phone number to approved tenants or after payment */}
-            {isOwner && (
-              <p>
-                <span className="font-medium">Phone:</span>{" "}
-                {listing.landlordId.phoneNumber}
+
+            {/* Show email and phone to landlord or tenant with approved request */}
+            {showContactDetails && (
+              <>
+                <p>
+                  <span className="font-medium">Email:</span>{" "}
+                  {listing.landlordId.email}
+                </p>
+                <p>
+                  <span className="font-medium">Phone:</span>{" "}
+                  {listing.landlordId.phoneNumber}
+                </p>
+              </>
+            )}
+
+            {/* Message for tenant who hasn't yet been approved */}
+            {isTenant && !hasRequestApproved && (
+              <p className="text-sm text-gray-500 mt-2">
+                * Contact details will be visible after your rental request is
+                approved and payment is completed.
               </p>
             )}
           </CardContent>

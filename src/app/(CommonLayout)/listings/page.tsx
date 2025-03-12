@@ -36,10 +36,9 @@ export default async function ListingsPage({
 }
 
 async function ListingsContent({ page }: { page: string }) {
-  const { data, meta } = await getAllListings(page, "3");
+  const response = await getAllListings(page, "3");
 
-  if (data.success) {
-    //! here is some issue console.log(data.success);
+  if (!response || !response.data) {
     return (
       <div className="bg-red-50 border border-red-200 text-red-700 p-4 rounded-md">
         Error loading listings. Please try again later.
@@ -47,10 +46,9 @@ async function ListingsContent({ page }: { page: string }) {
     );
   }
 
-  // const { data, meta } = response;
-  console.log(meta);
+  const { data, meta } = response;
 
-  if (data.length === 0) {
+  if (!Array.isArray(data) || data.length === 0) {
     return (
       <div className="bg-blue-50 border border-blue-200 text-blue-700 p-8 rounded-md text-center">
         <h3 className="text-xl font-medium mb-2">No listings found</h3>

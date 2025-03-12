@@ -68,7 +68,7 @@ export const createListing = async (listingData: FormData) => {
   }
 };
 
-export const updateListing = async (id: string, listingData: FormData) => {
+export const updateListing = async (id: string, listingData: any) => {
   try {
     const res = await fetch(
       `${process.env.NEXT_PUBLIC_BASE_API}/listing/${id}`,
