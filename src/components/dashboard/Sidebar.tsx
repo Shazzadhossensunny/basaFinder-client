@@ -75,13 +75,13 @@ const Sidebar: React.FC<SidebarProps> = ({
             id: "users",
             label: "User Management",
             icon: <Users className="h-5 w-5" />,
-            path: `${rolePath}/users`,
+            path: `${rolePath}/user-management`,
           },
           {
             id: "rentals",
             label: "Rental Management",
             icon: <List className="h-5 w-5" />,
-            path: `${rolePath}/rentals`,
+            path: `${rolePath}/rentals-management`,
           },
         ];
       case "landlord":
