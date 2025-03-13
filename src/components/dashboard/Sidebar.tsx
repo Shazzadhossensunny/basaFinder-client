@@ -92,20 +92,27 @@ const Sidebar: React.FC<SidebarProps> = ({
             label: "My Listings",
             icon: <Home className="h-5 w-5" />,
             path: `${rolePath}/listings`,
-            submenu: [
-              {
-                id: "create-listing",
-                label: "Create Listing",
-                path: `${rolePath}/listings/create`,
-                icon: <PlusCircle className="h-4 w-4" />,
-              },
-              {
-                id: "manage-listings",
-                label: "Manage Listings",
-                path: `${rolePath}/listings`,
-                icon: <List className="h-4 w-4" />,
-              },
-            ],
+
+            // submenu: [
+            //   {
+            //     id: "create-listing",
+            //     label: "Create Listing",
+            //     path: `${rolePath}/listings/create`,
+            //     icon: <PlusCircle className="h-4 w-4" />,
+            //   },
+            //   {
+            //     id: "manage-listings",
+            //     label: "Manage Listings",
+            //     path: `${rolePath}/listings`,
+            //     icon: <List className="h-4 w-4" />,
+            //   },
+            // ],
+          },
+          {
+            id: "manage-listings",
+            label: "Manage Listings",
+            path: `${rolePath}/manage-listings`,
+            icon: <List className="h-4 w-4" />,
           },
           {
             id: "requests",

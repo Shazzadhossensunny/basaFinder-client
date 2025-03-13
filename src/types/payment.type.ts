@@ -1,3 +1,5 @@
+import { IRequest } from "./request.type";
+
 export enum PaymentStatus {
   PENDING = "pending",
   COMPLETED = "completed",
@@ -6,7 +8,7 @@ export enum PaymentStatus {
 
 export interface IPayment {
   _id: string;
-  requestId: string;
+  requestId: string | IRequest;
   amount: number;
   status: PaymentStatus;
   transactionId?: string;

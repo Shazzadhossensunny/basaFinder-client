@@ -11,6 +11,8 @@
 //   updatedAt: string;
 // }
 
+import { IUser } from "./user";
+
 export interface IListing {
   _id: string;
   location: string;
@@ -18,10 +20,9 @@ export interface IListing {
   rent: number;
   bedrooms: number;
   images: string[];
+  amenities: string[];
   isAvailable: boolean;
-  landlordId: {
-    name: string;
-    email: string;
-    phoneNumber: string;
-  };
+  landlordId: string | IUser;
+  createdAt: string;
+  updatedAt: string;
 }
