@@ -287,7 +287,7 @@ const Sidebar: React.FC<SidebarProps> = ({
 
               {isProfileOpen && (
                 <div className="absolute bottom-full left-0 right-0 mb-2 bg-white dark:bg-gray-800 rounded-lg shadow-lg space-y-1">
-                  <Button
+                  {/* <Button
                     variant="ghost"
                     className="w-full justify-start"
                     onClick={() => {
@@ -297,7 +297,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                   >
                     <UserCog className="h-4 w-4 mr-3" />
                     Edit Profile
-                  </Button>
+                  </Button> */}
                   <Button
                     variant="ghost"
                     className="w-full justify-start"
