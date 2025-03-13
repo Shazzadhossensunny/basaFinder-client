@@ -75,15 +75,17 @@ export const createListing = async (listingData: any) => {
 };
 
 export const updateListing = async (id: string, listingData: any) => {
+  const token = await getValidToken();
   try {
     const res = await fetch(
       `${process.env.NEXT_PUBLIC_BASE_API}/listing/${id}`,
       {
         method: "PUT",
-        body: listingData,
         headers: {
-          Authorization: (await cookies()).get("accessToken")!.value,
+          "Content-Type": "application/json",
+          Authorization: token,
         },
+        body: JSON.stringify(listingData),
       }
     );
     revalidateTag("LISTINGS");

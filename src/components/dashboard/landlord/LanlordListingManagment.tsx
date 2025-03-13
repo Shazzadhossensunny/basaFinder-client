@@ -39,6 +39,7 @@ export default function LandlordListings() {
   const { user, isLoading, setIsLoading, setUser } = useUser();
   const [listings, setListings] = useState<IListing[]>([]);
   const [listingsLoading, setListingsLoading] = useState(true);
+  const [editModalOpen, setEditModalOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [selectedListing, setSelectedListing] = useState<IListing | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
@@ -71,7 +72,7 @@ export default function LandlordListings() {
   }, [user]);
 
   const handleCreateListing = () => {
-    router.push("/dashboard/landlord/listings/create");
+    router.push("/listings/create");
   };
 
   const handleEditListing = (listingId: string) => {
@@ -247,7 +248,7 @@ export default function LandlordListings() {
           </div>
         )}
       </div>
-
+      {/* delete model */}
       <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <DialogContent>
           <DialogHeader>
