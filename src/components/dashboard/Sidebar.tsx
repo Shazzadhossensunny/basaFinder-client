@@ -81,7 +81,7 @@ const Sidebar: React.FC<SidebarProps> = ({
             id: "rentals",
             label: "Rental Management",
             icon: <List className="h-5 w-5" />,
-            path: `${rolePath}/rentals-management`,
+            path: `${rolePath}/rental-management`,
           },
         ];
       case "landlord":
