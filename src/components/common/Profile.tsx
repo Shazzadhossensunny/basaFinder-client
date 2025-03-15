@@ -290,17 +290,17 @@ export default function Profile() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <h3 className="text-sm font-medium text-gray-500">Name</h3>
-              <p className="mt-1 text-lg font-medium">{userProfile.name}</p>
+              <p className="mt-1 text-lg font-medium">{userProfile?.name}</p>
             </div>
             <div>
               <h3 className="text-sm font-medium text-gray-500">Email</h3>
-              <p className="mt-1 text-lg">{userProfile.email}</p>
+              <p className="mt-1 text-lg">{userProfile?.email}</p>
             </div>
             <div>
               <h3 className="text-sm font-medium text-gray-500">
                 Phone Number
               </h3>
-              <p className="mt-1 text-lg">{userProfile.phoneNumber}</p>
+              <p className="mt-1 text-lg">{userProfile?.phoneNumber}</p>
             </div>
             <div>
               <h3 className="text-sm font-medium text-gray-500">Role</h3>
@@ -315,10 +315,10 @@ export default function Profile() {
             <div className="flex items-center">
               <span
                 className={`inline-block w-3 h-3 rounded-full mr-2 ${
-                  userProfile.isActive ? "bg-green-500" : "bg-red-500"
+                  userProfile?.isActive ? "bg-green-500" : "bg-red-500"
                 }`}
               ></span>
-              <span>{userProfile.isActive ? "Active" : "Inactive"}</span>
+              <span>{userProfile?.isActive ? "Active" : "Inactive"}</span>
             </div>
           </div>
 
