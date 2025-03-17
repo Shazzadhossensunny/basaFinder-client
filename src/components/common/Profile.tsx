@@ -26,7 +26,7 @@ import * as z from "zod";
 import { useRouter } from "next/navigation";
 import { Loader2, User } from "lucide-react";
 import { toast } from "sonner";
-import { getUserById } from "@/services/UserService";
+import { getUserById, updateProfile } from "@/services/UserService";
 
 // Define the User type based on your actual user data structure
 interface UserProfile {
@@ -46,25 +46,6 @@ const profileFormSchema = z.object({
   email: z.string().email({ message: "Invalid email address" }),
   phoneNumber: z.string().min(10, { message: "Invalid phone number" }),
 });
-
-// // Function to update user profile (you'll need to implement this in your userService)
-// const updateUserProfile = async (id: string, data: FormData) => {
-//   try {
-//     const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/users/${id}`, {
-//       method: 'PATCH',
-//       body: data,
-//       headers: {
-//         Authorization: document.cookie
-//           .split('; ')
-//           .find(row => row.startsWith('accessToken='))
-//           ?.split('=')[1] || '',
-//       },
-//     });
-//     return res.json();
-//   } catch (error: any) {
-//     return Error(error.message);
-//   }
-// };
 
 export default function Profile() {
   const { user: contextUser, isLoading: contextLoading } = useUser();
@@ -102,9 +83,9 @@ export default function Profile() {
           setUserProfile(userData.data);
           // Set form default values once user data is loaded
           form.reset({
-            name: userData.data.name,
-            email: userData.data.email,
-            phoneNumber: userData.data.phoneNumber,
+            name: userData.data?.name,
+            email: userData.data?.email,
+            phoneNumber: userData.data?.phoneNumber,
           });
         } else {
           toast.error("Failed to load user profile");
@@ -120,36 +101,37 @@ export default function Profile() {
     fetchUserData();
   }, [contextUser, contextLoading, form]);
 
-  // const onSubmit = async (values: z.infer<typeof profileFormSchema>) => {
-  //   if (!userProfile?._id) return;
+  const onSubmit = async (values: z.infer<typeof profileFormSchema>) => {
+    if (!userProfile?._id) {
+      toast.error("User profile not found");
+      return;
+    }
 
-  //   setIsSubmitting(true);
-  //   try {
-  //     // Create FormData to submit
-  //     const formData = new FormData();
-  //     formData.append('name', values.name);
-  //     formData.append('email', values.email);
-  //     formData.append('phoneNumber', values.phoneNumber);
+    setIsSubmitting(true);
+    try {
+      // Call the server action with proper parameters
+      const result = await updateProfile(userProfile._id, {
+        name: values.name,
+        email: values.email,
+        phoneNumber: values.phoneNumber,
+      });
 
-  //     // const result = await updateUserProfile(userProfile._id, formData);
+      // Handle successful update
+      setUserProfile((prev) => (prev ? { ...prev, ...result.data } : null));
+      toast.success("Profile updated successfully");
+      setIsEditing(false);
 
-  //     if (result.success) {
-  //       // Update local state
-  //       setUserProfile(prev => prev ? { ...prev, ...values } : null);
-
-  //       toast.success('Profile updated successfully');
-  //       setIsEditing(false);
-  //       router.refresh(); // Refresh the page to update the data
-  //     } else {
-  //       toast.error(result.message || 'Failed to update profile');
-  //     }
-  //   } catch (error) {
-  //     console.error('Error updating profile:', error);
-  //     toast.error('An error occurred while updating your profile');
-  //   } finally {
-  //     setIsSubmitting(false);
-  //   }
-  // };
+      // Optional: Only refresh if needed
+      router.refresh();
+    } catch (error: any) {
+      console.error("Error updating profile:", error);
+      toast.error(
+        error.message || "An error occurred while updating your profile"
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString("en-US", {
@@ -209,7 +191,7 @@ export default function Profile() {
               <User className="h-6 w-6 text-primary" />
               <CardTitle>Your Profile</CardTitle>
             </div>
-            {/* <Dialog open={isEditing} onOpenChange={setIsEditing}>
+            <Dialog open={isEditing} onOpenChange={setIsEditing}>
               <DialogTrigger asChild>
                 <Button variant="outline">Edit Profile</Button>
               </DialogTrigger>
@@ -283,7 +265,7 @@ export default function Profile() {
                   </form>
                 </Form>
               </DialogContent>
-            </Dialog> */}
+            </Dialog>
           </div>
         </CardHeader>
         <CardContent className="space-y-6 pt-6">
