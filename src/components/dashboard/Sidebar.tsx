@@ -298,7 +298,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                     <UserCog className="h-4 w-4 mr-3" />
                     Edit Profile
                   </Button> */}
-                  <Button
+                  {/* <Button
                     variant="ghost"
                     className="w-full justify-start"
                     onClick={() => {
@@ -308,7 +308,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                   >
                     <Lock className="h-4 w-4 mr-3" />
                     Change Password
-                  </Button>
+                  </Button> */}
                   <Button
                     variant="ghost"
                     className="w-full justify-start text-red-600 dark:text-red-400"

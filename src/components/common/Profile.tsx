@@ -3,7 +3,13 @@
 import { useState, useEffect } from "react";
 import { useUser } from "@/context/UserContext";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import {
   Dialog,
   DialogContent,
@@ -27,6 +33,7 @@ import { useRouter } from "next/navigation";
 import { Loader2, User } from "lucide-react";
 import { toast } from "sonner";
 import { getUserById, updateProfile } from "@/services/UserService";
+import Link from "next/link";
 
 // Define the User type based on your actual user data structure
 interface UserProfile {
@@ -65,20 +72,20 @@ export default function Profile() {
     },
   });
 
-  console.log(contextUser);
+  console.log("User", contextUser);
 
   useEffect(() => {
     const fetchUserData = async () => {
       if (contextLoading) return;
 
-      if (!contextUser) {
+      if (!contextUser || !contextUser.userId) {
         setLoading(false);
         return;
       }
 
       try {
         const userData = await getUserById(contextUser?.userId);
-        console.log(userData);
+        console.log("Fetched user data:", userData);
         if (userData && !userData.error) {
           setUserProfile(userData.data);
           // Set form default values once user data is loaded
@@ -320,6 +327,11 @@ export default function Profile() {
             </div>
           </div>
         </CardContent>
+        <CardFooter className="flex justify-end">
+          <Link href={"/change-password"}>
+            <Button variant="outline">Change Password</Button>
+          </Link>
+        </CardFooter>
       </Card>
     </div>
   );
