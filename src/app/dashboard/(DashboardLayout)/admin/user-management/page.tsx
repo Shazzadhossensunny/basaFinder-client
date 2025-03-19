@@ -1,8 +1,12 @@
 import AdminUserManagement from "@/components/dashboard/admin/AdminUserManagement";
-export default function AdminUserManagementPage() {
+import { getAllUsers } from "@/services/UserService";
+
+export default async function AdminUserManagementPage() {
+  const userData = await getAllUsers();
+
   return (
-    <div>
-      <AdminUserManagement />
+    <div className="container mx-auto py-6">
+      <AdminUserManagement userData={userData} />
     </div>
   );
 }

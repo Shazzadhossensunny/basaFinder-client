@@ -32,12 +32,13 @@ import {
   Trash2,
   UserX,
   UserCheck,
+  UserCog2,
 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
-  getAllUsers,
   toggleUserStatus,
   deleteUser,
+  changeRole,
 } from "@/services/UserService";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -48,40 +49,61 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { toast } from "sonner";
+import { useUser } from "@/context/UserContext";
 
-export default function UsersManagement() {
-  const [users, setUsers] = useState([]);
-  const [filteredUsers, setFilteredUsers] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
+interface User {
+  _id: string;
+  name: string;
+  email: string;
+  phoneNumber: string;
+  role: "admin" | "landlord" | "tenant";
+  isActive: boolean;
+  deactivatedAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+interface AdminUserManagementProps {
+  userData: {
+    success: boolean;
+    message: string;
+    data: User[];
+  };
+}
+
+export default function AdminUserManagement({
+  userData,
+}: AdminUserManagementProps) {
+  const [users, setUsers] = useState<User[]>(userData?.data || []);
+  const [filteredUsers, setFilteredUsers] = useState<User[]>(
+    userData?.data || []
+  );
   const [searchQuery, setSearchQuery] = useState("");
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [selectedUser, setSelectedUser] = useState(null);
-  const [confirmText, setConfirmText] = useState("");
   const [statusDialogOpen, setStatusDialogOpen] = useState(false);
-  const [actionType, setActionType] = useState("");
-
-  const fetchUsers = async () => {
-    setIsLoading(true);
-    try {
-      const response = await getAllUsers();
-      if (response.success) {
-        setUsers(response.data);
-        setFilteredUsers(response.data);
-      } else {
-        toast.error("Failed to fetch users");
-      }
-    } catch (error) {
-      toast.error("Error fetching users");
-      console.error(error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const [roleDialogOpen, setRoleDialogOpen] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [actionType, setActionType] = useState<"activate" | "deactivate">(
+    "activate"
+  );
+  const [selectedRole, setSelectedRole] = useState<
+    "admin" | "landlord" | "tenant"
+  >("tenant");
+  const [confirmText, setConfirmText] = useState("");
+  const { user, isLoading, setIsLoading } = useUser();
 
   useEffect(() => {
-    fetchUsers();
-  }, []);
+    setUsers(userData?.data || []);
+    setFilteredUsers(userData?.data || []);
+  }, [userData]);
 
   useEffect(() => {
     if (searchQuery) {
@@ -97,13 +119,17 @@ export default function UsersManagement() {
     }
   }, [searchQuery, users]);
 
+  const fetchUsers = async () => {
+    setUsers(userData?.data || []);
+  };
+
   const handleToggleStatus = async () => {
     setStatusDialogOpen(false);
     if (!selectedUser) return;
 
     setIsLoading(true);
     try {
-      const response = await toggleUserStatus(selectedUser.id);
+      const response = await toggleUserStatus(selectedUser._id);
       if (response.success) {
         toast.success(
           `User ${
@@ -122,6 +148,27 @@ export default function UsersManagement() {
     }
   };
 
+  const handleRoleChange = async () => {
+    setRoleDialogOpen(false);
+    if (!selectedUser) return;
+
+    setIsLoading(true);
+    try {
+      const response = await changeRole(selectedUser._id, selectedRole);
+      if (response.success) {
+        toast.success(`User role changed to ${selectedRole} successfully`);
+        fetchUsers();
+      } else {
+        toast.error(response.message || "Failed to update user role");
+      }
+    } catch (error) {
+      toast.error("Error updating user role");
+      console.error(error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const handleDeleteUser = async () => {
     if (confirmText !== selectedUser?.email) {
       toast.error("Email confirmation doesn't match");
@@ -132,7 +179,7 @@ export default function UsersManagement() {
     setIsLoading(true);
 
     try {
-      const response = await deleteUser(selectedUser.id);
+      const response = await deleteUser(selectedUser._id);
       if (response.success) {
         toast.success("User deleted successfully");
         fetchUsers();
@@ -148,18 +195,24 @@ export default function UsersManagement() {
     }
   };
 
-  const openStatusDialog = (user, type) => {
+  const openStatusDialog = (user: User, type: "activate" | "deactivate") => {
     setSelectedUser(user);
     setActionType(type);
     setStatusDialogOpen(true);
   };
 
-  const openDeleteDialog = (user) => {
+  const openRoleDialog = (user: User) => {
+    setSelectedUser(user);
+    setSelectedRole(user.role);
+    setRoleDialogOpen(true);
+  };
+
+  const openDeleteDialog = (user: User) => {
     setSelectedUser(user);
     setDeleteDialogOpen(true);
   };
 
-  const getRoleBadgeColor = (role) => {
+  const getRoleBadgeColor = (role: string) => {
     switch (role) {
       case "admin":
         return "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300";
@@ -243,7 +296,7 @@ export default function UsersManagement() {
                     ))
                 ) : filteredUsers.length > 0 ? (
                   filteredUsers.map((user) => (
-                    <TableRow key={user.userId}>
+                    <TableRow key={user._id}>
                       <TableCell className="font-medium">{user.name}</TableCell>
                       <TableCell>{user.email}</TableCell>
                       <TableCell>
@@ -258,11 +311,9 @@ export default function UsersManagement() {
                       </TableCell>
                       <TableCell>
                         <Badge
-                          variant={
-                            user.status === "active" ? "success" : "destructive"
-                          }
+                          variant={user.isActive ? "success" : "destructive"}
                         >
-                          {user.status === "active" ? "Active" : "Inactive"}
+                          {user.isActive ? "Active" : "Inactive"}
                         </Badge>
                       </TableCell>
                       <TableCell className="text-right">
@@ -275,7 +326,14 @@ export default function UsersManagement() {
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
                             <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                            {user.status === "active" ? (
+                            <DropdownMenuItem
+                              onClick={() => openRoleDialog(user)}
+                            >
+                              <UserCog2 className="mr-2 h-4 w-4" />
+                              Edit Role
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                            {user.isActive ? (
                               <DropdownMenuItem
                                 onClick={() =>
                                   openStatusDialog(user, "deactivate")
@@ -397,6 +455,59 @@ export default function UsersManagement() {
             >
               {actionType === "activate" ? "Activate" : "Deactivate"}
             </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Role Change Dialog */}
+      <Dialog open={roleDialogOpen} onOpenChange={setRoleDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Change User Role</DialogTitle>
+            <DialogDescription>
+              Update the user's role to change their permissions and access
+              levels in the system.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4 space-y-4">
+            <div>
+              <p>
+                User: <span className="font-medium">{selectedUser?.name}</span>
+              </p>
+              <p>
+                Email:{" "}
+                <span className="font-medium">{selectedUser?.email}</span>
+              </p>
+              <p>
+                Current Role:{" "}
+                <span className="font-medium">{selectedUser?.role}</span>
+              </p>
+            </div>
+
+            <div className="space-y-2">
+              <p className="text-sm font-medium">New Role:</p>
+              <Select
+                value={selectedRole}
+                onValueChange={(value) =>
+                  setSelectedRole(value as "admin" | "landlord" | "tenant")
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select role" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="admin">Admin</SelectItem>
+                  <SelectItem value="landlord">Landlord</SelectItem>
+                  <SelectItem value="tenant">Tenant</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setRoleDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleRoleChange}>Update Role</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

@@ -42,12 +42,32 @@ export const toggleUserStatus = async (id: string) => {
       {
         method: "PATCH",
         headers: {
+          "Content-Type": "application/json",
           Authorization: (await cookies()).get("accessToken")!.value,
         },
       }
     );
     revalidateTag("USERS");
-    return res.json();
+    return await res.json();
+  } catch (error: any) {
+    return Error(error.message);
+  }
+};
+export const changeRole = async (id: string, role: string) => {
+  try {
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_BASE_API}/users/change-role/${id}`,
+      {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: (await cookies()).get("accessToken")!.value,
+        },
+        body: JSON.stringify({ role }),
+      }
+    );
+    revalidateTag("USERS");
+    return await res.json();
   } catch (error: any) {
     return Error(error.message);
   }
@@ -62,7 +82,7 @@ export const deleteUser = async (id: string) => {
       },
     });
     revalidateTag("USERS");
-    return res.json();
+    return await res.json();
   } catch (error: any) {
     return Error(error.message);
   }
