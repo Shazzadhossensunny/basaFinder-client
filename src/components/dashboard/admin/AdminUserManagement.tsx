@@ -311,7 +311,12 @@ export default function AdminUserManagement({
                       </TableCell>
                       <TableCell>
                         <Badge
-                          variant={user.isActive ? "success" : "destructive"}
+                          variant={user.isActive ? "default" : "destructive"}
+                          className={
+                            user.isActive
+                              ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300"
+                              : ""
+                          }
                         >
                           {user.isActive ? "Active" : "Inactive"}
                         </Badge>
