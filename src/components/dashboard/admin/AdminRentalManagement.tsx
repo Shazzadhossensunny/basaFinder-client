@@ -1,4 +1,5 @@
 "use client";
+
 import { useState, useEffect } from "react";
 import {
   Card,
@@ -36,13 +37,10 @@ import {
   DollarSign,
   BedDouble,
   Bath,
+  CheckCircle,
+  XCircle,
 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
-import {
-  getAllListings,
-  getListingById,
-  deleteListing,
-} from "@/services/ListingService";
 import { Badge } from "@/components/ui/badge";
 import {
   Dialog,
@@ -55,30 +53,97 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { deleteListing, getListingById } from "@/services/ListingService";
 
-export default function RentalManagement() {
-  const [listings, setListings] = useState([]);
-  const [filteredListings, setFilteredListings] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
+// Define TypeScript interfaces
+interface Landlord {
+  name: string;
+  email: string;
+  phoneNumber: string;
+}
+
+interface Listing {
+  _id: string;
+  title?: string;
+  location: string;
+  description: string;
+  rent: number;
+  landlordId?: Landlord;
+  createdAt: string;
+  updatedAt: string;
+  isAvailable: boolean;
+  bedrooms: number;
+  bathrooms?: number;
+  images?: string[];
+  amenities?: string[];
+}
+
+interface ListingResponse {
+  success: boolean;
+  data: Listing[];
+  meta: {
+    total: number;
+    page: number;
+    limit: number;
+    totalPage: number;
+  };
+  message?: string;
+}
+
+interface DetailedListingResponse {
+  success: boolean;
+  data: Listing;
+  message?: string;
+}
+
+interface AdminRentalManagementProps {
+  listingData: ListingResponse;
+}
+
+export default function AdminRentalManagement({
+  listingData,
+}: AdminRentalManagementProps) {
+  const router = useRouter();
+  const [listings, setListings] = useState<Listing[]>([]);
+  const [filteredListings, setFilteredListings] = useState<Listing[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [selectedListing, setSelectedListing] = useState(null);
+  const [selectedListing, setSelectedListing] = useState<Listing | null>(null);
   const [viewDialogOpen, setViewDialogOpen] = useState(false);
-  const [detailedListing, setDetailedListing] = useState(null);
+  const [detailedListing, setDetailedListing] = useState<Listing | null>(null);
   const [viewLoading, setViewLoading] = useState(false);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const limit = 10;
 
+  useEffect(() => {
+    // Initialize with the server-provided data
+    if (listingData?.success) {
+      setListings(listingData.data);
+      setFilteredListings(listingData.data);
+      if (listingData.meta) {
+        setTotalPages(
+          listingData.meta.totalPage ||
+            Math.ceil(listingData.meta.total / limit)
+        );
+      }
+    }
+  }, [listingData]);
+
   const fetchListings = async () => {
     setIsLoading(true);
     try {
-      const response = await getAllListings(String(page), String(limit));
-      console.log(response);
-      if (response.success) {
-        setListings(response.data);
-        setFilteredListings(response.data);
-        setTotalPages(Math.ceil(response.meta.total / limit));
+      const response = await fetch(`/api/listings?page=${page}&limit=${limit}`);
+      const data: ListingResponse = await response.json();
+
+      if (data.success) {
+        setListings(data.data);
+        setFilteredListings(data.data);
+        setTotalPages(
+          data.meta.totalPage || Math.ceil(data.meta.total / limit)
+        );
       } else {
         toast.error("Failed to fetch listings");
       }
@@ -91,15 +156,23 @@ export default function RentalManagement() {
   };
 
   useEffect(() => {
-    fetchListings();
+    if (page > 1 || !listingData?.success) {
+      fetchListings();
+    }
   }, [page]);
 
   useEffect(() => {
     if (searchQuery) {
       const filtered = listings.filter(
         (listing) =>
-          listing.location.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          listing.description.toLowerCase().includes(searchQuery.toLowerCase())
+          listing.location
+            ?.toLowerCase()
+            .includes(searchQuery?.toLowerCase()) ||
+          listing.description
+            .toLowerCase()
+            .includes(searchQuery.toLowerCase()) ||
+          listing.title?.toLowerCase().includes(searchQuery?.toLowerCase()) ||
+          false
       );
       setFilteredListings(filtered);
     } else {
@@ -108,11 +181,13 @@ export default function RentalManagement() {
   }, [searchQuery, listings]);
 
   const handleDeleteListing = async () => {
+    if (!selectedListing) return;
+
     setDeleteDialogOpen(false);
     setIsLoading(true);
 
     try {
-      const response = await deleteListing(selectedListing?.id);
+      const response = await deleteListing(selectedListing._id);
       if (response.success) {
         toast.success("Listing deleted successfully");
         fetchListings();
@@ -127,12 +202,13 @@ export default function RentalManagement() {
     }
   };
 
-  const handleViewListing = async (listing) => {
+  const handleViewListing = async (listing: Listing) => {
     setSelectedListing(listing);
     setViewDialogOpen(true);
     setViewLoading(true);
+
     try {
-      const response = await getListingById(listing.id);
+      const response = await getListingById(listing._id);
       if (response.success) {
         setDetailedListing(response.data);
       } else {
@@ -146,17 +222,54 @@ export default function RentalManagement() {
     }
   };
 
-  const openDeleteDialog = (listing) => {
+  const handleAvailabilityToggle = async (listing: Listing) => {
+    try {
+      const response = await fetch(`/api/listings/${listing._id}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          isAvailable: !listing.isAvailable,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        toast.success(
+          `Listing marked as ${
+            !listing.isAvailable ? "available" : "unavailable"
+          }`
+        );
+        fetchListings();
+      } else {
+        toast.error(data.message || "Failed to update listing status");
+      }
+    } catch (error) {
+      toast.error("Error updating listing status");
+      console.error(error);
+    }
+  };
+
+  const openDeleteDialog = (listing: Listing) => {
     setSelectedListing(listing);
     setDeleteDialogOpen(true);
   };
 
-  const formatDate = (dateString) => {
+  const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString("en-US", {
       year: "numeric",
       month: "short",
       day: "numeric",
     });
+  };
+
+  const getListingTitle = (listing: Listing) => {
+    return (
+      listing.title ||
+      `${listing.bedrooms} BR Rental in ${listing.location.split(",")[0]}`
+    );
   };
 
   return (
@@ -197,6 +310,7 @@ export default function RentalManagement() {
             <Table>
               <TableHeader>
                 <TableRow>
+                  <TableHead>Property</TableHead>
                   <TableHead>Location</TableHead>
                   <TableHead>Price</TableHead>
                   <TableHead>Landlord</TableHead>
@@ -210,9 +324,9 @@ export default function RentalManagement() {
                   // Loading skeleton
                   Array.from({ length: 5 }).map((_, index) => (
                     <TableRow key={index}>
-                      {/* <TableCell>
+                      <TableCell>
                         <Skeleton className="h-4 w-[150px]" />
-                      </TableCell> */}
+                      </TableCell>
                       <TableCell>
                         <Skeleton className="h-4 w-[100px]" />
                       </TableCell>
@@ -235,26 +349,32 @@ export default function RentalManagement() {
                   ))
                 ) : filteredListings?.length > 0 ? (
                   filteredListings.map((listing) => (
-                    <TableRow key={listing?._id}>
+                    <TableRow key={listing._id}>
                       <TableCell className="font-medium">
-                        {listing.title}
+                        <div className="flex items-center gap-2">
+                          <BedDouble className="h-4 w-4 text-muted-foreground" />
+                          <span>{listing.bedrooms} BR</span>
+                          {getListingTitle(listing)}
+                        </div>
                       </TableCell>
                       <TableCell>{listing.location}</TableCell>
                       <TableCell>
-                        <DollarSign className="inline h-4 w-4 mr-1" />
-                        {listing.rent}/mo
+                        <div className="flex items-center">
+                          <DollarSign className="h-4 w-4 mr-1" />
+                          {listing.rent.toLocaleString()}/mo
+                        </div>
                       </TableCell>
-                      <TableCell>{listing.landlord?.name || "N/A"}</TableCell>
+                      <TableCell>{listing.landlordId?.name || "N/A"}</TableCell>
                       <TableCell>{formatDate(listing.createdAt)}</TableCell>
                       <TableCell>
                         <Badge
                           variant={
-                            listing.status === "active"
-                              ? "default"
-                              : "secondary"
+                            listing.isAvailable ? "default" : "secondary"
                           }
+                          className="cursor-pointer"
+                          onClick={() => handleAvailabilityToggle(listing)}
                         >
-                          {listing.status}
+                          {listing.isAvailable ? "Available" : "Unavailable"}
                         </Badge>
                       </TableCell>
                       <TableCell className="text-right">
@@ -275,12 +395,27 @@ export default function RentalManagement() {
                             <DropdownMenuItem
                               onClick={() =>
                                 router.push(
-                                  `/dashboard/listings/edit/${listing.id}`
+                                  `/dashboard/admin/listings/edit/${listing._id}`
                                 )
                               }
                             >
                               <Edit2 className="mr-2 h-4 w-4" />
                               Edit
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() => handleAvailabilityToggle(listing)}
+                            >
+                              {listing.isAvailable ? (
+                                <>
+                                  <XCircle className="mr-2 h-4 w-4" />
+                                  Mark Unavailable
+                                </>
+                              ) : (
+                                <>
+                                  <CheckCircle className="mr-2 h-4 w-4" />
+                                  Mark Available
+                                </>
+                              )}
                             </DropdownMenuItem>
                             <DropdownMenuSeparator />
                             <DropdownMenuItem
@@ -353,8 +488,9 @@ export default function RentalManagement() {
           ) : (
             detailedListing && (
               <Tabs defaultValue="details">
-                <TabsList className="grid w-full grid-cols-2">
+                <TabsList className="grid w-full grid-cols-3">
                   <TabsTrigger value="details">Details</TabsTrigger>
+                  <TabsTrigger value="amenities">Amenities</TabsTrigger>
                   <TabsTrigger value="images">Images</TabsTrigger>
                 </TabsList>
                 <TabsContent value="details">
@@ -369,7 +505,11 @@ export default function RentalManagement() {
                           </div>
                           <div className="flex items-center">
                             <Bath className="h-4 w-4 mr-2 text-muted-foreground" />
-                            {detailedListing.bathrooms} Bathrooms
+                            {detailedListing.bathrooms || 1} Bathrooms
+                          </div>
+                          <div className="flex items-center col-span-2">
+                            <DollarSign className="h-4 w-4 mr-2 text-muted-foreground" />
+                            {detailedListing.rent.toLocaleString()} per month
                           </div>
                         </div>
                       </div>
@@ -379,6 +519,22 @@ export default function RentalManagement() {
                           <Map className="h-4 w-4 mr-2 text-muted-foreground" />
                           {detailedListing.location}
                         </div>
+                        <div className="mt-4">
+                          <h4 className="font-medium">Landlord Information</h4>
+                          <div className="mt-2 text-sm">
+                            <p>
+                              Name: {detailedListing.landlordId?.name || "N/A"}
+                            </p>
+                            <p>
+                              Email:{" "}
+                              {detailedListing.landlordId?.email || "N/A"}
+                            </p>
+                            <p>
+                              Phone:{" "}
+                              {detailedListing.landlordId?.phoneNumber || "N/A"}
+                            </p>
+                          </div>
+                        </div>
                       </div>
                     </div>
                     <div>
@@ -387,26 +543,88 @@ export default function RentalManagement() {
                         {detailedListing.description}
                       </p>
                     </div>
+                    <div className="flex justify-between items-center">
+                      <div>
+                        <Badge
+                          variant={
+                            detailedListing.isAvailable
+                              ? "default"
+                              : "secondary"
+                          }
+                        >
+                          {detailedListing.isAvailable
+                            ? "Available"
+                            : "Unavailable"}
+                        </Badge>
+                      </div>
+                      <div className="text-sm text-muted-foreground">
+                        <span>
+                          Created: {formatDate(detailedListing.createdAt)}
+                        </span>
+                        <span className="ml-4">
+                          Updated: {formatDate(detailedListing.updatedAt)}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </TabsContent>
+                <TabsContent value="amenities">
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                    {detailedListing?.amenities?.length ? (
+                      detailedListing.amenities.map((amenity, index) => (
+                        <div
+                          key={index}
+                          className="flex items-center p-2 border rounded-md"
+                        >
+                          <CheckCircle className="h-4 w-4 mr-2 text-green-500" />
+                          {amenity}
+                        </div>
+                      ))
+                    ) : (
+                      <div className="col-span-full text-center py-4 text-muted-foreground">
+                        No amenities listed
+                      </div>
+                    )}
                   </div>
                 </TabsContent>
                 <TabsContent value="images">
-                  <div className="grid grid-cols-2 gap-4">
-                    {detailedListing?.images?.map((image, index) => (
-                      <div key={index} className="relative aspect-video">
-                        <Image
-                          src={image}
-                          alt={`Property image ${index + 1}`}
-                          fill
-                          className="rounded-md object-cover"
-                        />
-                      </div>
-                    ))}
-                  </div>
+                  {detailedListing?.images?.length ? (
+                    <div className="grid grid-cols-2 gap-4">
+                      {detailedListing.images.map((image, index) => (
+                        <div key={index} className="relative aspect-video">
+                          <Image
+                            src={image}
+                            alt={`Property image ${index + 1}`}
+                            fill
+                            className="rounded-md object-cover"
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-center py-4 text-muted-foreground">
+                      No images available
+                    </div>
+                  )}
                 </TabsContent>
               </Tabs>
             )
           )}
           <DialogFooter>
+            {detailedListing && (
+              <Button
+                variant="outline"
+                className="mr-auto"
+                onClick={() =>
+                  router.push(
+                    `/dashboard/admin/listings/edit/${detailedListing._id}`
+                  )
+                }
+              >
+                <Edit2 className="mr-2 h-4 w-4" />
+                Edit Listing
+              </Button>
+            )}
             <Button onClick={() => setViewDialogOpen(false)}>Close</Button>
           </DialogFooter>
         </DialogContent>
