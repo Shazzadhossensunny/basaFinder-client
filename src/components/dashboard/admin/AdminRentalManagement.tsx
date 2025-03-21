@@ -222,35 +222,35 @@ export default function AdminRentalManagement({
     }
   };
 
-  const handleAvailabilityToggle = async (listing: Listing) => {
-    try {
-      const response = await fetch(`/api/listings/${listing._id}`, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          isAvailable: !listing.isAvailable,
-        }),
-      });
+  // const handleAvailabilityToggle = async (listing: Listing) => {
+  //   try {
+  //     const response = await fetch(`/api/listings/${listing._id}`, {
+  //       method: "PATCH",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //       },
+  //       body: JSON.stringify({
+  //         isAvailable: !listing.isAvailable,
+  //       }),
+  //     });
 
-      const data = await response.json();
+  //     const data = await response.json();
 
-      if (data.success) {
-        toast.success(
-          `Listing marked as ${
-            !listing.isAvailable ? "available" : "unavailable"
-          }`
-        );
-        fetchListings();
-      } else {
-        toast.error(data.message || "Failed to update listing status");
-      }
-    } catch (error) {
-      toast.error("Error updating listing status");
-      console.error(error);
-    }
-  };
+  //     if (data.success) {
+  //       toast.success(
+  //         `Listing marked as ${
+  //           !listing.isAvailable ? "available" : "unavailable"
+  //         }`
+  //       );
+  //       fetchListings();
+  //     } else {
+  //       toast.error(data.message || "Failed to update listing status");
+  //     }
+  //   } catch (error) {
+  //     toast.error("Error updating listing status");
+  //     console.error(error);
+  //   }
+  // };
 
   const openDeleteDialog = (listing: Listing) => {
     setSelectedListing(listing);
@@ -372,7 +372,7 @@ export default function AdminRentalManagement({
                             listing.isAvailable ? "default" : "secondary"
                           }
                           className="cursor-pointer"
-                          onClick={() => handleAvailabilityToggle(listing)}
+                          // onClick={() => handleAvailabilityToggle(listing)}
                         >
                           {listing.isAvailable ? "Available" : "Unavailable"}
                         </Badge>
@@ -402,7 +402,7 @@ export default function AdminRentalManagement({
                               <Edit2 className="mr-2 h-4 w-4" />
                               Edit
                             </DropdownMenuItem>
-                            <DropdownMenuItem
+                            {/* <DropdownMenuItem
                               onClick={() => handleAvailabilityToggle(listing)}
                             >
                               {listing.isAvailable ? (
@@ -416,7 +416,7 @@ export default function AdminRentalManagement({
                                   Mark Available
                                 </>
                               )}
-                            </DropdownMenuItem>
+                            </DropdownMenuItem> */}
                             <DropdownMenuSeparator />
                             <DropdownMenuItem
                               className="text-red-600"
