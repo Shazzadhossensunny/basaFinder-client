@@ -58,12 +58,10 @@ export function LoginForm() {
 
   const onSubmit: SubmitHandler<FieldValues> = async (data) => {
     try {
-      setIsLoading(true);
       const result = await loginUser(data);
-      console.log("Login API Response:", result); // Debugging
+      setIsLoading(true);
       if (result?.success) {
         toast.success(result?.message);
-        console.log("User Role:", user); // Debugging
         // Redirect based on user role
         const userRole = user?.role;
         if (userRole === "admin") {
@@ -81,8 +79,6 @@ export function LoginForm() {
     } catch (error) {
       console.error("Login Error:", error);
       toast.error("Login failed. Please check your credentials.");
-    } finally {
-      setIsLoading(false);
     }
   };
 

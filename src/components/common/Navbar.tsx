@@ -30,8 +30,8 @@ const Navbar = () => {
 
   const handleLogout = async () => {
     try {
-      setIsLoading(true);
       await logout();
+      setIsLoading(true);
       setUser(null); // Clear user context
       toast.success("Logged out successfully.");
       router.push("/");
