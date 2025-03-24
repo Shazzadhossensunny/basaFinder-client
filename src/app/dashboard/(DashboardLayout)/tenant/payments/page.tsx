@@ -241,7 +241,7 @@ export default function PaymentHistoryPage() {
                           <span>{formatDate(payment.createdAt)}</span>
                         </div>
                       </TableCell>
-                      <TableCell>{payment.listingId.location}</TableCell>
+                      <TableCell>{payment.listingId?.location}</TableCell>
                       <TableCell>
                         {payment.amount.toLocaleString()} {payment.currency}
                       </TableCell>

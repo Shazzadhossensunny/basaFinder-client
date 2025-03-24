@@ -1,7 +1,6 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { Menu, X, User, LogOut, Home, PlusCircle } from "lucide-react";
 import { useUser } from "@/context/UserContext";
@@ -15,69 +14,80 @@ const Navbar = () => {
   const pathname = usePathname();
   const router = useRouter();
 
-  const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
+  // Close mobile menu when route changes
+  useEffect(() => {
+    setIsMenuOpen(false);
+  }, [pathname]);
 
   const getDashboardPath = () => {
-    if (!user || !user?.role) return "/login";
-    return user?.role === "admin"
-      ? "/dashboard/admin"
-      : user?.role === "landlord"
-      ? "/dashboard/landlord"
-      : user?.role === "tenant"
-      ? "/dashboard/tenant"
-      : "/";
+    if (!user?.role) {
+      // If no role but user exists (loading state), return empty
+      return user ? "#" : "/login";
+    }
+    switch (user.role) {
+      case "admin":
+        return "/dashboard/admin";
+      case "landlord":
+        return "/dashboard/landlord";
+      case "tenant":
+        return "/dashboard/tenant";
+      default:
+        return "/";
+    }
   };
 
   const handleLogout = async () => {
     try {
-      await logout();
       setIsLoading(true);
-      setUser(null); // Clear user context
+      await logout();
+      setUser(null);
       toast.success("Logged out successfully.");
       router.push("/");
     } catch (error) {
       toast.error("Logout failed. Please try again.");
     } finally {
       setIsLoading(false);
-      setIsMenuOpen(false);
     }
   };
 
-  // Define base nav items
+  // Base nav items for all users
   const baseNavItems = [
     { label: "Home", path: "/" },
-    { label: "About Us", path: "/about" },
     { label: "Listings", path: "/listings" },
+    { label: "About", path: "/about" },
     { label: "Contact", path: "/contact" },
-    { label: "Dashboard", path: getDashboardPath() },
   ];
 
-  // Add "Create Listing" for landlords
-  const navItems = [...baseNavItems];
-  if (user?.role === "landlord") {
-    navItems.push({
-      label: "Create Listing",
-      path: "/listings/create",
+  // Conditional items
+  const conditionalNavItems = [];
+
+  if (user) {
+    // Add Dashboard for logged-in users
+    conditionalNavItems.push({
+      label: "Dashboard",
+      path: getDashboardPath(),
     });
+
+    // Add "Create Listing" for landlords
+    if (user.role === "landlord") {
+      conditionalNavItems.push({
+        label: "Create Listing",
+        path: "/listings/create",
+      });
+    }
   }
+
+  const navItems = [...baseNavItems, ...conditionalNavItems];
 
   return (
     <nav className="bg-white shadow-md sticky top-0 z-50">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16 items-center">
           {/* Logo */}
-          <div className="flex items-center">
-            <Link href="/" className="flex items-center space-x-2">
-              {/* <Image
-                src="/logo.svg"
-                alt="BasaFinder Logo"
-                width={40}
-                height={40}
-              /> */}
-              <span className="text-xl font-bold text-primary">BasaFinder</span>
-              <span className="text-2xl">🏡</span>
-            </Link>
-          </div>
+          <Link href="/" className="flex items-center space-x-2">
+            <span className="text-xl font-bold text-primary">BasaFinder</span>
+            <span className="text-2xl">🏡</span>
+          </Link>
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex md:items-center md:space-x-6">
@@ -92,8 +102,9 @@ const Navbar = () => {
                 {item.label}
               </Link>
             ))}
+
             {user ? (
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-4 ml-4">
                 <Link
                   href="/profile"
                   className="flex items-center gap-2 text-sm font-medium hover:text-primary"
@@ -110,7 +121,7 @@ const Navbar = () => {
                 </Button>
               </div>
             ) : (
-              <div className="flex gap-2">
+              <div className="flex gap-2 ml-4">
                 <Link href="/login">
                   <Button variant="outline" size="sm">
                     Login
@@ -126,7 +137,7 @@ const Navbar = () => {
           {/* Mobile Menu Button */}
           <div className="md:hidden">
             <button
-              onClick={toggleMenu}
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
               className="p-2 rounded-md text-gray-700 hover:text-primary"
             >
               {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
@@ -137,44 +148,45 @@ const Navbar = () => {
 
       {/* Mobile Navigation */}
       {isMenuOpen && (
-        <div className="md:hidden bg-white shadow-md">
+        <div className="md:hidden bg-white shadow-md absolute w-full">
           <div className="px-4 pt-4 pb-3 space-y-2">
             {navItems.map((item) => (
               <Link
                 key={item.path}
                 href={item.path}
-                onClick={() => setIsMenuOpen(false)}
-                className={`block px-3 py-2 rounded-md text-sm font-medium hover:text-primary ${
-                  pathname === item.path ? "text-primary" : "text-gray-700"
+                className={`block px-3 py-2 rounded-md text-sm font-medium ${
+                  pathname === item.path
+                    ? "text-primary bg-primary/10"
+                    : "text-gray-700 hover:bg-gray-50"
                 }`}
               >
                 {item.label}
               </Link>
             ))}
+
             {user ? (
               <>
                 <Link
                   href="/profile"
-                  onClick={() => setIsMenuOpen(false)}
-                  className="block px-3 py-2 text-sm font-medium hover:text-primary"
+                  className="block px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
                 >
                   Profile
                 </Link>
                 <button
                   onClick={handleLogout}
-                  className="w-full text-left block px-3 py-2 text-sm font-medium text-gray-700 hover:text-primary"
+                  className="w-full text-left block px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
                 >
                   Logout
                 </button>
               </>
             ) : (
-              <div className="flex flex-col gap-2 px-4 pb-4">
-                <Link href="/login" onClick={() => setIsMenuOpen(false)}>
+              <div className="pt-2 space-y-2">
+                <Link href="/login">
                   <Button variant="outline" className="w-full">
                     Login
                   </Button>
                 </Link>
-                <Link href="/register" onClick={() => setIsMenuOpen(false)}>
+                <Link href="/register">
                   <Button className="w-full">Register</Button>
                 </Link>
               </div>
