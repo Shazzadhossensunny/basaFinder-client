@@ -3,64 +3,94 @@ import { NextRequest, NextResponse } from "next/server";
 
 type Role = keyof typeof roleBasedPrivateRoutes;
 
-const authRoutes = ["/login", "/register"];
+const publicRoutes = [
+  "/", // Home
+  "/about", // About
+  "/contact", // Contact
+  "/login", // Auth
+  "/register",
+  "/listings", // Only the main listings page is public
+];
+
 const commonPrivateRoutes = ["/profile", "/change-password"];
 
 const roleBasedPrivateRoutes = {
-  admin: [/^\/dashboard/],
-  landlord: [/^\/dashboard/, /^\/listings\/create/],
-  tenant: [/^\/dashboard/],
+  admin: [/^\/dashboard\/admin/, /^\/api\/admin/],
+  landlord: [
+    /^\/dashboard\/landlord/,
+    /^\/listings\/create/, // Only landlord can create
+    /^\/api\/landlord/,
+  ],
+  tenant: [/^\/dashboard\/tenant/, /^\/api\/tenant/],
 };
 
 export const middleware = async (request: NextRequest) => {
   const { pathname } = request.nextUrl;
-  const userInfo = await getCurrentUser();
 
-  // Not logged in
-  if (!userInfo) {
-    if (authRoutes.includes(pathname)) {
-      return NextResponse.next();
-    } else {
-      return NextResponse.redirect(
-        new URL(
-          `http://localhost:3000/login?redirectPath=${pathname}`,
-          request.url
-        )
-      );
-    }
+  // ✅ Public routes (excluding listing details)
+  const isPublicRoute =
+    publicRoutes.includes(pathname) ||
+    pathname.startsWith("/_next") ||
+    pathname.startsWith("/static");
+
+  if (isPublicRoute) {
+    return NextResponse.next();
   }
 
-  // Logged in user
+  const userInfo = await getCurrentUser();
+
+  // Check if this is a listing detail page (matches /listings/123 pattern)
+  const isListingDetailPage =
+    pathname.startsWith("/listings/") && pathname !== "/listings/create";
+
+  // ❌ Not logged in trying to access protected routes (including listing details)
   const isCommonPrivateRoute = commonPrivateRoutes.some((route) =>
     pathname.startsWith(route)
   );
 
-  const role = userInfo.role as Role;
-  const allowedPatterns = roleBasedPrivateRoutes[role] || [];
-
-  const isRoleBasedRoute = allowedPatterns.some((pattern) =>
-    pattern.test(pathname)
+  const isRoleBasedRoute = Object.values(roleBasedPrivateRoutes).some(
+    (patterns) => patterns.some((pattern) => pattern.test(pathname))
   );
 
-  if (isCommonPrivateRoute || isRoleBasedRoute) {
-    return NextResponse.next();
+  if (
+    !userInfo &&
+    (isCommonPrivateRoute || isRoleBasedRoute || isListingDetailPage)
+  ) {
+    return NextResponse.redirect(
+      new URL(`/login?redirectPath=${pathname}`, request.url)
+    );
   }
 
-  // Unauthorized
-  return NextResponse.redirect(new URL("/", request.url));
+  // ✅ Logged in user — check role-based access
+  if (userInfo) {
+    // For listing details, any logged-in user can access
+    if (isListingDetailPage) {
+      return NextResponse.next();
+    }
+
+    const role = userInfo.role as Role;
+    const allowedPatterns = roleBasedPrivateRoutes[role] || [];
+
+    const isAllowed =
+      isCommonPrivateRoute ||
+      allowedPatterns.some((pattern) => pattern.test(pathname));
+
+    if (isAllowed) {
+      return NextResponse.next();
+    }
+
+    // ❌ Logged in but unauthorized
+    return NextResponse.redirect(new URL("/", request.url));
+  }
+
+  // Fallback allow
+  return NextResponse.next();
 };
 
 export const config = {
   matcher: [
-    "/dashboard",
-    "/dashboard/:page",
-    "/admin",
-    "/admin/:page",
-    "/landlord",
-    "/landlord/:page",
-    "/tenant/",
-    "/tenant/:page",
-    "/listings/create",
+    "/dashboard/:path*",
+    "/listings/:path*",
     "/profile",
     "/change-password",
     "/api/:path*",
