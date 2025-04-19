@@ -7,6 +7,7 @@ import { useUser } from "@/context/UserContext";
 import { logout } from "@/services/AuthService";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import { protectedRoutes } from "@/contants";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -43,6 +44,9 @@ const Navbar = () => {
       setUser(null);
       toast.success("Logged out successfully.");
       router.push("/");
+      if (protectedRoutes.some((route) => pathname.match(route))) {
+        router.push("/");
+      }
     } catch (error) {
       toast.error("Logout failed. Please try again.");
     } finally {

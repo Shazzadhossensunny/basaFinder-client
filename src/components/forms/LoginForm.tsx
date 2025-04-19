@@ -63,13 +63,18 @@ export function LoginForm() {
       if (result?.success) {
         toast.success(result?.message);
         // Redirect based on user role
-        const userRole = user?.role;
-        if (userRole === "admin") {
-          router.push("/admin");
-        } else if (userRole === "landlord") {
-          router.push("/landlord");
-        } else if (userRole === "tenant") {
-          router.push("/tenant");
+        // const userRole = user?.role;
+        // if (userRole === "admin") {
+        //   router.push("/admin");
+        // } else if (userRole === "landlord") {
+        //   router.push("/landlord");
+        // } else if (userRole === "tenant") {
+        //   router.push("/tenant");
+        // } else {
+        //   router.push("/");
+        // }
+        if (redirect) {
+          router.push(redirect);
         } else {
           router.push("/");
         }

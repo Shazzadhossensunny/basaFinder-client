@@ -1,0 +1,15 @@
+export const protectedRoutes = [
+  "/login",
+  "/dashboard",
+  "/dashboard/:page",
+  "/listings/create/:page",
+  "/listings/:id/:page",
+  "profile",
+  "chang-password",
+  "/admin",
+  "/admin/:page",
+  "/landlord",
+  "/landlord/:page",
+  "/tenant/",
+  "/tenant/:page",
+];

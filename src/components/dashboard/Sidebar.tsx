@@ -20,6 +20,7 @@ import { logout } from "@/services/AuthService";
 import { toast } from "sonner";
 import { IUser } from "@/types/user"; // Assuming you have an IUser interface
 import Image from "next/image";
+import { protectedRoutes } from "@/contants";
 
 interface SidebarProps {
   children?: React.ReactNode;
@@ -162,6 +163,9 @@ const Sidebar: React.FC<SidebarProps> = ({
       setUser(null);
       toast.success("Logged out successfully.");
       router.push("/");
+      if (protectedRoutes.some((route) => pathname.match(route))) {
+        router.push("/");
+      }
     } catch (error) {
       toast.error("Logout failed. Please try again.");
     } finally {

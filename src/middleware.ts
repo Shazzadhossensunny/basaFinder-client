@@ -7,13 +7,9 @@ const authRoutes = ["/login", "/register"];
 const commonPrivateRoutes = ["/profile", "/change-password"];
 
 const roleBasedPrivateRoutes = {
-  admin: [/^\/dashboard\/admin/, /^\/api\/admin/],
-  landlord: [
-    /^\/dashboard\/landlord/,
-    /^\/listings\/create/,
-    /^\/api\/landlord/,
-  ],
-  tenant: [/^\/dashboard\/tenant/, /^\/api\/tenant/],
+  admin: [/^\/dashboard/],
+  landlord: [/^\/dashboard/, /^\/listings\/create/],
+  tenant: [/^\/dashboard/],
 };
 
 export const middleware = async (request: NextRequest) => {
@@ -57,7 +53,13 @@ export const middleware = async (request: NextRequest) => {
 export const config = {
   matcher: [
     "/dashboard",
-    "/dashboard/:path*",
+    "/dashboard/:page",
+    "/admin",
+    "/admin/:page",
+    "/landlord",
+    "/landlord/:page",
+    "/tenant/",
+    "/tenant/:page",
     "/listings/create",
     "/profile",
     "/change-password",
