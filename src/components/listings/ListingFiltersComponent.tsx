@@ -26,25 +26,53 @@ const ListingFilters = () => {
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
+  // Initialize state from URL parameters
   const [location, setLocation] = useState(searchParams.get("location") || "");
-  const [price, setPrice] = useState<number>(
-    parseInt(searchParams.get("price") || "5000")
+  const [maxPrice, setMaxPrice] = useState<number>(
+    parseInt(searchParams.get("maxPrice") || "5000")
   );
   const [bedrooms, setBedrooms] = useState(searchParams.get("bedrooms") || "");
 
+  // Sync state when URL params change (for back/forward navigation)
+  useEffect(() => {
+    setLocation(searchParams.get("location") || "");
+    setMaxPrice(parseInt(searchParams.get("maxPrice") || "5000"));
+    setBedrooms(searchParams.get("bedrooms") || "");
+  }, [searchParams]);
+
   const applyFilters = () => {
-    const params = new URLSearchParams();
+    // Create a new URLSearchParams object
+    const params = new URLSearchParams(searchParams.toString());
 
-    if (location) params.set("location", location);
-    if (price) params.set("price", price.toString());
-    if (bedrooms) params.set("bedrooms", bedrooms);
+    // Update or remove location parameter
+    if (location) {
+      params.set("location", location);
+    } else {
+      params.delete("location");
+    }
 
+    // Update price parameter - rename to maxPrice to match backend
+    params.set("maxPrice", maxPrice.toString());
+
+    // Update or remove bedrooms parameter
+    if (bedrooms && bedrooms !== "Any") {
+      params.set("bedrooms", bedrooms);
+    } else {
+      params.delete("bedrooms");
+    }
+
+    // Preserve page parameter if it exists, otherwise reset to page 1
+    if (!params.has("page")) {
+      params.set("page", "1");
+    }
+
+    // Navigate with updated parameters
     router.push(`${pathname}?${params.toString()}`);
   };
 
   const resetFilters = () => {
     setLocation("");
-    setPrice(5000);
+    setMaxPrice(5000);
     setBedrooms("");
     router.push(pathname);
   };
@@ -81,16 +109,16 @@ const ListingFilters = () => {
                 <div className="flex justify-between items-center">
                   <span className="text-sm text-gray-500">$0</span>
                   <span className="text-sm font-medium">
-                    ${price.toLocaleString()}
+                    ${maxPrice.toLocaleString()}
                   </span>
                   <span className="text-sm text-gray-500">$10,000+</span>
                 </div>
                 <Slider
-                  value={[price]}
+                  value={[maxPrice]}
                   min={0}
                   max={10000}
                   step={100}
-                  onValueChange={(value) => setPrice(value[0])}
+                  onValueChange={(value) => setMaxPrice(value[0])}
                 />
               </div>
             </AccordionContent>
@@ -107,11 +135,11 @@ const ListingFilters = () => {
                     <SelectValue placeholder="Any" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">Any</SelectItem>
+                    <SelectItem value="Any">Any</SelectItem>
                     <SelectItem value="1">1+ Bedroom</SelectItem>
                     <SelectItem value="2">2+ Bedrooms</SelectItem>
                     <SelectItem value="3">3+ Bedrooms</SelectItem>
-                    <SelectItem value="4">4+ Bedrooms</SelectItem>
+                    <SelectItem value="4+">4+ Bedrooms</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

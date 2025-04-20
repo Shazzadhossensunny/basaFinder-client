@@ -1,19 +1,15 @@
-// app/listings/page.tsx
 import { Suspense } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getAllListings } from "@/services/ListingService";
 import ListingFilters from "@/components/listings/ListingFiltersComponent";
 import ListingGrid from "@/components/common/ListingCard";
 import Pagination from "@/components/common/Pagination";
-
+type SearchParams = Promise<{ [key: string]: string | string[] | undefined }>;
 export default async function ListingsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ page: string }>;
+  searchParams: SearchParams;
 }) {
-  const { page } = await searchParams;
-  // const limit = (await searchParams?.limit?.toString()) || "12";
-
   return (
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold mb-6">Available Rental Properties</h1>
@@ -27,7 +23,7 @@ export default async function ListingsPage({
         {/* Listings Grid */}
         <div className="lg:col-span-3">
           <Suspense fallback={<ListingsLoadingSkeleton />}>
-            <ListingsContent page={page} />
+            <ListingsContent searchParams={searchParams} />
           </Suspense>
         </div>
       </div>
@@ -35,8 +31,13 @@ export default async function ListingsPage({
   );
 }
 
-async function ListingsContent({ page }: { page: string }) {
-  const response = await getAllListings(page, "3");
+async function ListingsContent({
+  searchParams,
+}: {
+  searchParams: SearchParams;
+}) {
+  const query = await searchParams;
+  const response = await getAllListings(undefined, undefined, query);
 
   if (!response || !response.data) {
     return (
