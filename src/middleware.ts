@@ -4,12 +4,12 @@ import { NextRequest, NextResponse } from "next/server";
 type Role = keyof typeof roleBasedPrivateRoutes;
 
 const publicRoutes = [
-  "/", // Home
-  "/about", // About
-  "/contact", // Contact
-  "/login", // Auth
+  "/",
+  "/about",
+  "/contact",
+  "/login",
   "/register",
-  "/listings", // Only the main listings page is public
+  "/listings",
 ];
 
 const commonPrivateRoutes = ["/profile", "/change-password"];
