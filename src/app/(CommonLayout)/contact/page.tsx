@@ -1,235 +1,337 @@
 // app/contact/page.tsx
-"use client";
-
-import { useState } from "react";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Send, MapPin, Phone, Mail, Clock } from "lucide-react";
-
-import { Input } from "@/components/ui/input";
+import Image from "next/image";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
+import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-
-const contactFormSchema = z.object({
-  name: z.string().min(2, { message: "Name must be at least 2 characters." }),
-  email: z.string().email({ message: "Invalid email address." }),
-  subject: z
-    .string()
-    .min(5, { message: "Subject must be at least 5 characters." }),
-  message: z
-    .string()
-    .min(10, { message: "Message must be at least 10 characters." }),
-});
-
-type ContactFormValues = z.infer<typeof contactFormSchema>;
 
 export default function ContactPage() {
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isSuccess, setIsSuccess] = useState(false);
-
-  const form = useForm<ContactFormValues>({
-    resolver: zodResolver(contactFormSchema),
-    defaultValues: {
-      name: "",
-      email: "",
-      subject: "",
-      message: "",
-    },
-  });
-
-  const onSubmit = async (data: ContactFormValues) => {
-    setIsSubmitting(true);
-
-    // Simulate API call
-    setTimeout(() => {
-      console.log("Form data:", data);
-      setIsSubmitting(false);
-      setIsSuccess(true);
-      form.reset();
-
-      // Reset success message after 5 seconds
-      setTimeout(() => setIsSuccess(false), 5000);
-    }, 1500);
-  };
-
   return (
-    <div className="container mx-auto px-4 py-12">
-      <h1 className="text-4xl font-bold mb-2 text-center text-blue-700">
-        Contact Us
-      </h1>
-      <p className="text-gray-600 text-center mb-12 max-w-2xl mx-auto">
-        Have questions about BasaFinder? We're here to help! Fill out the form
-        below or use our contact information to get in touch with our team.
-      </p>
-
-      <div className="grid md:grid-cols-3 gap-8 mb-12">
-        <div className="bg-white rounded-lg shadow-md p-6">
-          <div className="flex items-center mb-4">
-            <div className="bg-blue-100 p-3 rounded-full mr-4">
-              <MapPin className="h-6 w-6 text-blue-700" />
-            </div>
-            <div>
-              <h3 className="font-semibold text-lg">Our Location</h3>
-              <p className="text-gray-600">
-                123 Gulshan Avenue, Dhaka, Bangladesh
+    <div className="min-h-screen">
+      {/* Hero Section */}
+      <div className="bg-gradient-to-r from-blue-600 to-indigo-700 text-white py-20">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col md:flex-row items-center gap-8">
+            <div className="md:w-1/2">
+              <h1 className="text-4xl md:text-5xl font-bold mb-4">
+                Contact BasaFinder
+              </h1>
+              <p className="text-lg text-blue-100 mb-6">
+                Have questions or need assistance? Our team is here to help you
+                find your perfect home in Bangladesh. Reach out to us today.
               </p>
+              <Link href="/listings">
+                <Button
+                  size="lg"
+                  className="bg-white text-blue-700 hover:bg-blue-50"
+                >
+                  Browse Listings
+                </Button>
+              </Link>
             </div>
-          </div>
-        </div>
-
-        <div className="bg-white rounded-lg shadow-md p-6">
-          <div className="flex items-center mb-4">
-            <div className="bg-blue-100 p-3 rounded-full mr-4">
-              <Phone className="h-6 w-6 text-blue-700" />
-            </div>
-            <div>
-              <h3 className="font-semibold text-lg">Phone Number</h3>
-              <p className="text-gray-600">+880 1234-567890</p>
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-white rounded-lg shadow-md p-6">
-          <div className="flex items-center mb-4">
-            <div className="bg-blue-100 p-3 rounded-full mr-4">
-              <Mail className="h-6 w-6 text-blue-700" />
-            </div>
-            <div>
-              <h3 className="font-semibold text-lg">Email Address</h3>
-              <p className="text-gray-600">info@basafinder.com</p>
+            <div className="md:w-1/2 relative h-64 md:h-96 w-full rounded-lg overflow-hidden shadow-xl">
+              <Image
+                src="/api/placeholder/800/600"
+                alt="Contact BasaFinder"
+                fill
+                className="object-cover"
+              />
             </div>
           </div>
         </div>
       </div>
 
-      <div className="grid md:grid-cols-2 gap-8">
-        {/* Contact Form */}
-        <div className="bg-white rounded-lg shadow-md p-8">
-          <h2 className="text-2xl font-semibold mb-6">Send Us a Message</h2>
-
-          {isSuccess && (
-            <div className="mb-6 p-4 bg-green-100 text-green-800 rounded-md">
-              Thank you for your message! We'll get back to you as soon as
-              possible.
+      {/* Contact Form Section */}
+      <section className="py-16 bg-white">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <h2 className="text-3xl font-bold mb-10 text-center">Get In Touch</h2>
+          <div className="grid md:grid-cols-2 gap-12">
+            <div className="bg-gradient-to-r from-blue-50 to-purple-50 p-8 rounded-xl shadow-sm">
+              <h3 className="text-xl font-semibold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600">
+                Send Us a Message
+              </h3>
+              <form className="space-y-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label
+                      htmlFor="firstName"
+                      className="block text-sm font-medium text-gray-700 mb-1"
+                    >
+                      First Name
+                    </label>
+                    <Input
+                      id="firstName"
+                      placeholder="Enter your first name"
+                      className="w-full"
+                    />
+                  </div>
+                  <div>
+                    <label
+                      htmlFor="lastName"
+                      className="block text-sm font-medium text-gray-700 mb-1"
+                    >
+                      Last Name
+                    </label>
+                    <Input
+                      id="lastName"
+                      placeholder="Enter your last name"
+                      className="w-full"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label
+                    htmlFor="email"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
+                    Email Address
+                  </label>
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="Enter your email address"
+                    className="w-full"
+                  />
+                </div>
+                <div>
+                  <label
+                    htmlFor="phone"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
+                    Phone Number
+                  </label>
+                  <Input
+                    id="phone"
+                    placeholder="Enter your phone number"
+                    className="w-full"
+                  />
+                </div>
+                <div>
+                  <label
+                    htmlFor="message"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
+                    Your Message
+                  </label>
+                  <Textarea
+                    id="message"
+                    placeholder="How can we help you?"
+                    rows={4}
+                    className="w-full"
+                  />
+                </div>
+                <Button className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:from-blue-700 hover:to-purple-700">
+                  Send Message
+                </Button>
+              </form>
             </div>
-          )}
-
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-              <FormField
-                control={form.control}
-                name="name"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Your Name</FormLabel>
-                    <FormControl>
-                      <Input placeholder="John Doe" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Email Address</FormLabel>
-                    <FormControl>
-                      <Input placeholder="your.email@example.com" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="subject"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Subject</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Your subject" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="message"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Message</FormLabel>
-                    <FormControl>
-                      <Textarea
-                        placeholder="Write your message here..."
-                        className="min-h-32"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <Button type="submit" className="w-full" disabled={isSubmitting}>
-                {isSubmitting ? (
-                  "Sending..."
-                ) : (
-                  <>
-                    <Send className="mr-2 h-4 w-4" /> Send Message
-                  </>
-                )}
-              </Button>
-            </form>
-          </Form>
+            <div className="flex flex-col justify-between">
+              <div>
+                <h3 className="text-xl font-semibold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600">
+                  Contact Information
+                </h3>
+                <div className="space-y-6">
+                  <div className="flex items-start space-x-4">
+                    <div className="bg-blue-100 p-3 rounded-full">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        strokeWidth={1.5}
+                        stroke="currentColor"
+                        className="w-6 h-6 text-blue-600"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z"
+                        />
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z"
+                        />
+                      </svg>
+                    </div>
+                    <div>
+                      <h4 className="font-medium text-gray-800">
+                        Our Location
+                      </h4>
+                      <p className="text-gray-600 mt-1">
+                        123 Gulshan Avenue, Dhaka 1212, Bangladesh
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-start space-x-4">
+                    <div className="bg-blue-100 p-3 rounded-full">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        strokeWidth={1.5}
+                        stroke="currentColor"
+                        className="w-6 h-6 text-blue-600"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75"
+                        />
+                      </svg>
+                    </div>
+                    <div>
+                      <h4 className="font-medium text-gray-800">
+                        Email Address
+                      </h4>
+                      <p className="text-gray-600 mt-1">
+                        contact@basafinder.com
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-start space-x-4">
+                    <div className="bg-blue-100 p-3 rounded-full">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        strokeWidth={1.5}
+                        stroke="currentColor"
+                        className="w-6 h-6 text-blue-600"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 01-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 00-1.091-.852H4.5A2.25 2.25 0 002.25 4.5v2.25z"
+                        />
+                      </svg>
+                    </div>
+                    <div>
+                      <h4 className="font-medium text-gray-800">
+                        Phone Number
+                      </h4>
+                      <p className="text-gray-600 mt-1">+880 1700-000000</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="mt-10 bg-gradient-to-r from-blue-50 to-purple-50 p-6 rounded-xl shadow-sm">
+                <h3 className="text-xl font-semibold mb-3 bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600">
+                  Business Hours
+                </h3>
+                <ul className="space-y-2 text-gray-700">
+                  <li className="flex justify-between">
+                    <span>Monday - Friday:</span>
+                    <span className="font-medium">9:00 AM - 6:00 PM</span>
+                  </li>
+                  <li className="flex justify-between">
+                    <span>Saturday:</span>
+                    <span className="font-medium">10:00 AM - 4:00 PM</span>
+                  </li>
+                  <li className="flex justify-between">
+                    <span>Sunday:</span>
+                    <span className="font-medium">Closed</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
         </div>
+      </section>
 
-        {/* Map and Office Hours */}
-        <div>
-          <div className="bg-gray-200 rounded-lg h-80 mb-6 flex items-center justify-center">
-            <p className="text-gray-600">
-              Interactive Map Will Be Embedded Here
+      <Separator className="max-w-6xl mx-auto" />
+
+      {/* Map Section */}
+      <section className="py-16 bg-gray-50">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <h2 className="text-3xl font-bold mb-10 text-center">Find Us</h2>
+          <div className="relative h-96 w-full rounded-xl overflow-hidden shadow-lg">
+            <Image
+              src="/api/placeholder/1200/600"
+              alt="BasaFinder Office Location Map"
+              fill
+              className="object-cover"
+            />
+          </div>
+        </div>
+      </section>
+
+      {/* FAQ Section */}
+      <section className="py-16 bg-white">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <h2 className="text-3xl font-bold mb-10 text-center">
+            Frequently Asked Questions
+          </h2>
+          <div className="grid md:grid-cols-2 gap-6">
+            {[
+              {
+                question: "How do I list my property on BasaFinder?",
+                answer:
+                  "You can easily list your property by creating an account, clicking on 'Add Listing' and following the step-by-step guide to upload property details and photos.",
+              },
+              {
+                question: "Is BasaFinder available throughout Bangladesh?",
+                answer:
+                  "Yes, BasaFinder services are available across all major cities in Bangladesh, with a focus on Dhaka, Chittagong, and Sylhet regions.",
+              },
+              {
+                question: "How can I schedule a property viewing?",
+                answer:
+                  "Once you find a property you're interested in, you can request a viewing directly through our platform. The property owner or agent will then contact you to arrange a convenient time.",
+              },
+              {
+                question: "What fees does BasaFinder charge?",
+                answer:
+                  "BasaFinder is free for tenants searching for properties. Property owners may have listing fees depending on their subscription plan. Check our pricing page for more details.",
+              },
+            ].map((faq, index) => (
+              <div
+                key={index}
+                className="rounded-xl p-6 bg-gradient-to-r from-blue-50 to-purple-50 shadow-sm hover:shadow-md transition-shadow"
+              >
+                <h3 className="text-xl font-semibold mb-3 bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600">
+                  {faq.question}
+                </h3>
+                <p className="text-gray-600">{faq.answer}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Call to Action */}
+      <section className="py-16 bg-gray-50">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl p-8 text-white text-center">
+            <h2 className="text-3xl font-bold mb-4">
+              Ready to Start Your Housing Journey?
+            </h2>
+            <p className="text-lg mb-6 max-w-2xl mx-auto">
+              Whether you're looking for a new place to call home or want to
+              list your property, BasaFinder makes it simple and stress-free.
             </p>
-          </div>
-
-          <div className="bg-white rounded-lg shadow-md p-6">
-            <div className="flex items-center mb-4">
-              <Clock className="h-6 w-6 text-blue-700 mr-2" />
-              <h3 className="font-semibold text-lg">Office Hours</h3>
-            </div>
-
-            <div className="space-y-2">
-              <div className="flex justify-between">
-                <span className="text-gray-600">Monday - Friday:</span>
-                <span className="font-medium">9:00 AM - 6:00 PM</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-600">Saturday:</span>
-                <span className="font-medium">10:00 AM - 4:00 PM</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-600">Sunday:</span>
-                <span className="font-medium">Closed</span>
-              </div>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Link href="/signup">
+                <Button
+                  size="lg"
+                  className="bg-white text-blue-600 hover:bg-blue-50"
+                >
+                  Sign Up Now
+                </Button>
+              </Link>
+              <Link href="/listings">
+                <Button
+                  size="lg"
+                  variant="outline"
+                  className="border-white text-white hover:bg-white/10"
+                >
+                  Browse Listings
+                </Button>
+              </Link>
             </div>
           </div>
         </div>
-      </div>
+      </section>
     </div>
   );
 }
