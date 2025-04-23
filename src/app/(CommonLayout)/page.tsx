@@ -180,14 +180,14 @@ export default async function HomePage({
           <div className="flex flex-col sm:flex-row justify-center gap-4">
             <Button
               size="lg"
-              className="bg-blue-600 hover:bg-blue-700 text-white"
+              className="bg-white text-blue-600 hover:bg-blue-50"
             >
               Search Properties
             </Button>
             <Button
               size="lg"
               variant="outline"
-              className="border-blue-600 text-blue-600 hover:bg-blue-50"
+              className="border-white bg-transparent text-white hover:bg-white/10"
             >
               List Your Property
             </Button>

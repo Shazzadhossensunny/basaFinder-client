@@ -246,7 +246,7 @@ const InlineSearchResults = ({
             <div className="flex gap-2">
               <Button
                 type="submit"
-                className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 text-white"
+                className="flex-1 bg-blue-600 hover:bg-blue-700 text-white"
               >
                 <Search className="mr-2 h-4 w-4" />
                 Search Properties
@@ -307,7 +307,7 @@ const InlineSearchResults = ({
                 </p>
                 <Button
                   variant="outline"
-                  className="mt-4"
+                  className="mt-4 bg-blue-600 hover:bg-blue-700 text-white"
                   onClick={() => {
                     clearSearch();
                     handleSearch();

@@ -18,7 +18,7 @@ const Hero = () => {
             <Link href="/listings">
               <Button
                 size="lg"
-                className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white"
+                className="w-full sm:w-auto bg-white text-blue-600 hover:bg-blue-50"
               >
                 Browse Listings
               </Button>
@@ -27,7 +27,7 @@ const Hero = () => {
               <Button
                 size="lg"
                 variant="outline"
-                className="w-full sm:w-auto border-blue-600 text-blue-600 hover:bg-blue-50"
+                className="w-full sm:w-auto border-white text-white hover:bg-white/10 bg-transparent"
               >
                 Post a Rental
               </Button>

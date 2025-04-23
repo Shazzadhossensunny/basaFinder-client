@@ -205,7 +205,7 @@ export function RegisterForm() {
             />
             <Button
               type="submit"
-              className="w-full mt-6"
+              className="w-full mt-6 bg-blue-600 hover:bg-blue-700 text-white"
               disabled={isSubmitting}
             >
               {isSubmitting ? "Creating Account..." : "Register"}
@@ -218,7 +218,7 @@ export function RegisterForm() {
           Already have an account?{" "}
           <Link
             href="/login"
-            className="text-primary font-medium hover:underline"
+            className="text-blue-600 font-medium hover:underline"
           >
             Login
           </Link>

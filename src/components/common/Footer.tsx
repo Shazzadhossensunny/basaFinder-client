@@ -11,26 +11,22 @@ const Footer = () => {
           {/* Logo and Tagline */}
           <div>
             <div className="flex items-center">
-              {/* <Image
-                src="/logo-white.svg"
-                alt="BasaFinder Logo"
-                width={40}
-                height={40}
-              /> */}
-              <span className="ml-2 text-xl font-bold">BasaFinder</span>
+              <span className=" text-xl font-bold text-blue-600">
+                BasaFinder
+              </span>
               <span className="text-2xl">🏡</span>
             </div>
             <p className="mt-2 text-sm text-gray-400">
               Your smart rental housing solution for finding the perfect home.
             </p>
             <div className="mt-4 flex space-x-4">
-              <a href="#" className="text-gray-400 hover:text-white">
+              <a href="#" className="text-gray-400 hover:text-blue-600">
                 <Facebook size={20} />
               </a>
-              <a href="#" className="text-gray-400 hover:text-white">
+              <a href="#" className="text-gray-400 hover:text-blue-600">
                 <Twitter size={20} />
               </a>
-              <a href="#" className="text-gray-400 hover:text-white">
+              <a href="#" className="text-gray-400 hover:text-blue-600">
                 <Instagram size={20} />
               </a>
             </div>
@@ -41,19 +37,22 @@ const Footer = () => {
             <h3 className="text-lg font-semibold mb-4">Quick Links</h3>
             <ul className="space-y-2">
               <li>
-                <Link href="/" className="text-gray-400 hover:text-white">
+                <Link href="/" className="text-gray-400 hover:text-blue-600">
                   Home
                 </Link>
               </li>
               <li>
-                <Link href="/about" className="text-gray-400 hover:text-white">
+                <Link
+                  href="/about"
+                  className="text-gray-400 hover:text-blue-600"
+                >
                   About Us
                 </Link>
               </li>
               <li>
                 <Link
                   href="/listings"
-                  className="text-gray-400 hover:text-white"
+                  className="text-gray-400 hover:text-blue-600"
                 >
                   Browse Listings
                 </Link>
@@ -61,7 +60,7 @@ const Footer = () => {
               <li>
                 <Link
                   href="/contact"
-                  className="text-gray-400 hover:text-white"
+                  className="text-gray-400 hover:text-blue-600"
                 >
                   Contact Us
                 </Link>
@@ -74,20 +73,23 @@ const Footer = () => {
             <h3 className="text-lg font-semibold mb-4">Legal</h3>
             <ul className="space-y-2">
               <li>
-                <Link href="/terms" className="text-gray-400 hover:text-white">
+                <Link
+                  href="/terms"
+                  className="text-gray-400 hover:text-blue-600"
+                >
                   Terms of Service
                 </Link>
               </li>
               <li>
                 <Link
                   href="/privacy"
-                  className="text-gray-400 hover:text-white"
+                  className="text-gray-400 hover:text-blue-600"
                 >
                   Privacy Policy
                 </Link>
               </li>
               <li>
-                <Link href="/faq" className="text-gray-400 hover:text-white">
+                <Link href="/faq" className="text-gray-400 hover:text-blue-600">
                   FAQs
                 </Link>
               </li>

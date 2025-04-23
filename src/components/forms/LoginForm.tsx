@@ -130,7 +130,11 @@ export function LoginForm() {
                 </FormItem>
               )}
             />
-            <Button type="submit" className="w-full" disabled={isSubmitting}>
+            <Button
+              type="submit"
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+              disabled={isSubmitting}
+            >
               {isSubmitting ? "Logging in..." : "Login"}
             </Button>
           </form>
@@ -141,7 +145,7 @@ export function LoginForm() {
           Don't have an account?{" "}
           <Link
             href="/register"
-            className="text-primary font-medium hover:underline"
+            className="text-blue-600 font-medium hover:underline"
           >
             Register
           </Link>

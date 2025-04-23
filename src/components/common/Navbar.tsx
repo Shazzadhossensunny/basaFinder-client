@@ -89,7 +89,7 @@ const Navbar = () => {
         <div className="flex justify-between h-16 items-center">
           {/* Logo */}
           <Link href="/" className="flex items-center space-x-2">
-            <span className="text-xl font-bold text-primary">BasaFinder</span>
+            <span className="text-xl font-bold text-blue-600">BasaFinder</span>
             <span className="text-2xl">🏡</span>
           </Link>
 
@@ -99,8 +99,8 @@ const Navbar = () => {
               <Link
                 key={item.path}
                 href={item.path}
-                className={`px-3 py-2 text-sm font-medium hover:text-primary transition ${
-                  pathname === item.path ? "text-primary" : "text-gray-700"
+                className={`px-3 py-2 text-sm font-medium hover:text-blue-600 transition ${
+                  pathname === item.path ? "text-blue-600" : "text-gray-700"
                 }`}
               >
                 {item.label}
@@ -127,12 +127,21 @@ const Navbar = () => {
             ) : (
               <div className="flex gap-2 ml-4">
                 <Link href="/login">
-                  <Button variant="outline" size="sm">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="w-full border-blue-600 text-blue-600 hover:bg-blue-50"
+                  >
                     Login
                   </Button>
                 </Link>
                 <Link href="/register">
-                  <Button size="sm">Register</Button>
+                  <Button
+                    size="sm"
+                    className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+                  >
+                    Register
+                  </Button>
                 </Link>
               </div>
             )}
@@ -160,7 +169,7 @@ const Navbar = () => {
                 href={item.path}
                 className={`block px-3 py-2 rounded-md text-sm font-medium ${
                   pathname === item.path
-                    ? "text-primary bg-primary/10"
+                    ? "text-blue-600 bg-blue-50"
                     : "text-gray-700 hover:bg-gray-50"
                 }`}
               >
@@ -178,7 +187,7 @@ const Navbar = () => {
                 </Link>
                 <button
                   onClick={handleLogout}
-                  className="w-full text-left block px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                  className="w-full text-left block px-3 py-2 text-sm font-medium border-blue-600 text-blue-600 hover:bg-blue-50"
                 >
                   Logout
                 </button>
@@ -186,12 +195,17 @@ const Navbar = () => {
             ) : (
               <div className="pt-2 space-y-2">
                 <Link href="/login">
-                  <Button variant="outline" className="w-full">
+                  <Button
+                    variant="outline"
+                    className="w-full border-blue-600 text-blue-600 hover:bg-blue-50"
+                  >
                     Login
                   </Button>
                 </Link>
                 <Link href="/register">
-                  <Button className="w-full">Register</Button>
+                  <Button className="w-full w-full bg-blue-600 hover:bg-blue-700 text-white">
+                    Register
+                  </Button>
                 </Link>
               </div>
             )}

@@ -53,7 +53,10 @@ const ListingCard = ({ listing }: ListingCardProps) => {
 
       <CardFooter className="p-4 pt-0">
         <Link href={`/listings/${_id}`} className="w-full">
-          <Button variant="outline" className="w-full">
+          <Button
+            variant="outline"
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white border-0 cursor-pointer transition-colors duration-200"
+          >
             View Details
           </Button>
         </Link>
