@@ -3,7 +3,7 @@ import { Button } from "../ui/button";
 
 const Hero = () => {
   return (
-    <div className="relative bg-gradient-to-r from-blue-600 to-indigo-700 text-white overflow-hidden">
+    <div className="relative bg-gradient-to-r from-blue-600 to-purple-600 text-white overflow-hidden">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-32">
         <div className="md:w-3/5">
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight">
@@ -18,16 +18,16 @@ const Hero = () => {
             <Link href="/listings">
               <Button
                 size="lg"
-                className="w-full sm:w-auto bg-white text-blue-700 hover:bg-blue-50"
+                className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white"
               >
                 Browse Listings
               </Button>
             </Link>
-            <Link href="/landlord/create-listing">
+            <Link href="/listings/create">
               <Button
                 size="lg"
                 variant="outline"
-                className="w-full sm:w-auto border-white text-white hover:bg-white/10"
+                className="w-full sm:w-auto border-blue-600 text-blue-600 hover:bg-blue-50"
               >
                 Post a Rental
               </Button>

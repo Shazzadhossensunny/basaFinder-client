@@ -8,32 +8,38 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import ListingCard from "@/components/home/ListingCard";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { getAllListings } from "@/services/ListingService";
-import { toast } from "sonner";
 
-const FeaturedListings = () => {
+const FeaturedListings = ({ featuresListingsData }: any) => {
   const [listings, setListings] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  // useEffect(() => {
+  //   const fetchListings = async () => {
+  //     try {
+  //       const response = await getAllListings("1", "6");
+
+  //       if (response.success) {
+  //         setListings(response.data);
+  //       } else {
+  //         toast.error("Failed to fetch listings");
+  //       }
+  //     } catch (err: any) {
+  //       toast.error(err.message);
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
+
+  //   fetchListings();
+  // }, []);
+
   useEffect(() => {
-    const fetchListings = async () => {
-      try {
-        const response = await getAllListings("1", "6");
-
-        if (response.success) {
-          setListings(response.data);
-        } else {
-          toast.error("Failed to fetch listings");
-        }
-      } catch (err: any) {
-        toast.error(err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchListings();
-  }, []);
+    if (featuresListingsData.length > 0) {
+      setListings(featuresListingsData);
+      setLoading(false);
+      return;
+    }
+  }, [featuresListingsData]);
 
   if (loading) {
     return <LoadingSkeleton />;
@@ -79,7 +85,10 @@ const FeaturedListings = () => {
 
         <div className="text-center mt-10">
           <Link href="/listings">
-            <Button size="lg" className="px-8">
+            <Button
+              size="lg"
+              className="px-8 bg-blue-600 hover:bg-blue-700 text-white"
+            >
               View All Properties
             </Button>
           </Link>

@@ -21,7 +21,7 @@ export default async function HomePage({
     <main className="min-h-screen">
       <Hero />
       {/* Search Section */}
-      <section className="bg-gradient-to-b from-white to-gray-50 py-8 md:py-12">
+      <section className="bg-gradient-to-b from-white to-gray-50 py-10 md:py-14">
         <div className="container mx-auto px-4">
           <div className="relative -mt-24 md:-mt-32">
             <InlineSearchResults initialListings={listingsData || []} />
@@ -29,14 +29,11 @@ export default async function HomePage({
         </div>
       </section>
       {/* Featured Properties Section */}
-      <section className="py-16 bg-gray-50">
-        <div className="container mx-auto px-4">
-          <FeaturedListings />
-        </div>
-      </section>
+
+      <FeaturedListings featuresListingsData={listingsData || []} />
 
       {/* Benefits Section */}
-      <section className="py-16 bg-white">
+      <section className="py-12 md:py-16 bg-white">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold mb-4">Why Choose Us</h2>
@@ -48,7 +45,7 @@ export default async function HomePage({
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {/* Benefit 1 */}
-            <div className="bg-blue-50 p-6 rounded-xl text-center hover:shadow-lg transition-shadow">
+            <div className="bg-blue-50 p-6 rounded-xl text-center shadow-sm hover:shadow-md transition-shadow">
               <div className="w-16 h-16 bg-blue-600 rounded-full mx-auto mb-4 flex items-center justify-center">
                 <Building className="h-8 w-8 text-white" />
               </div>
@@ -60,7 +57,7 @@ export default async function HomePage({
             </div>
 
             {/* Benefit 2 */}
-            <div className="bg-purple-50 p-6 rounded-xl text-center hover:shadow-lg transition-shadow">
+            <div className="bg-purple-50 p-6 rounded-xl text-center shadow-sm hover:shadow-md transition-shadow">
               <div className="w-16 h-16 bg-purple-600 rounded-full mx-auto mb-4 flex items-center justify-center">
                 <Users className="h-8 w-8 text-white" />
               </div>
@@ -72,7 +69,7 @@ export default async function HomePage({
             </div>
 
             {/* Benefit 3 */}
-            <div className="bg-green-50 p-6 rounded-xl text-center hover:shadow-lg transition-shadow">
+            <div className="bg-green-50 p-6 rounded-xl text-center shadow-sm hover:shadow-md transition-shadow">
               <div className="w-16 h-16 bg-green-600 rounded-full mx-auto mb-4 flex items-center justify-center">
                 <Phone className="h-8 w-8 text-white" />
               </div>
@@ -87,7 +84,7 @@ export default async function HomePage({
       </section>
 
       {/* Testimonials Section */}
-      <section className="py-16 bg-gray-50">
+      <section className="py-12 md:py-16 bg-gray-50">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold mb-4">What Our Customers Say</h2>
@@ -171,7 +168,7 @@ export default async function HomePage({
         </div>
       </section>
       {/* CTA Section */}
-      <section className="py-16 bg-gradient-to-r from-blue-600 to-purple-600 text-white">
+      <section className="py-12 md:py-16 bg-gradient-to-r from-blue-600 to-purple-600 text-white">
         <div className="container mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold mb-4">
             Ready to Find Your Perfect Home?
@@ -180,17 +177,17 @@ export default async function HomePage({
             Thousands of properties are waiting for you. Start your search today
             and find the perfect place to call home.
           </p>
-          <div className="flex justify-center gap-4">
+          <div className="flex flex-col sm:flex-row justify-center gap-4">
             <Button
               size="lg"
-              className="bg-white text-blue-600 hover:bg-blue-50"
+              className="bg-blue-600 hover:bg-blue-700 text-white"
             >
               Search Properties
             </Button>
             <Button
               size="lg"
               variant="outline"
-              className="border-white text-white hover:bg-white/10"
+              className="border-blue-600 text-blue-600 hover:bg-blue-50"
             >
               List Your Property
             </Button>

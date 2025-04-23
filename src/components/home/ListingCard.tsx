@@ -19,7 +19,7 @@ const ListingCard = ({ listing }: ListingCardProps) => {
   const { _id, images, location, description, rent, bedrooms } = listing;
 
   return (
-    <Card className="overflow-hidden h-full flex flex-col transition-transform hover:scale-[1.02]">
+    <Card className="bg-white rounded-xl shadow-md hover:shadow-lg overflow-hidden h-full flex flex-col transition-transform hover:scale-[1.02]">
       <div className="relative w-full h-48">
         <Image
           src={images[0] || "/placeholder-house.jpg"}

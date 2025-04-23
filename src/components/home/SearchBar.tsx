@@ -182,7 +182,7 @@ const InlineSearchResults = ({
   return (
     <div className="w-full max-w-6xl mx-auto">
       {/* Search Box */}
-      <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
+      <div className="bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow overflow-hidden">
         <div className="p-6 bg-gradient-to-r from-blue-50 to-purple-50">
           <h2 className="text-2xl font-bold mb-4 text-center bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600">
             Find Your Dream Home
