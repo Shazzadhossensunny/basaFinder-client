@@ -45,7 +45,7 @@ const ListingCard = ({ listing, priority = false }: ListingCardProps) => {
         legacyBehavior
         prefetch={false}
       >
-        <a className="block h-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+        <a className="block h-full focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-2">
           {/* Image Container */}
           <div className="relative h-48 w-full bg-gray-50">
             <Image
@@ -78,7 +78,7 @@ const ListingCard = ({ listing, priority = false }: ListingCardProps) => {
           </div>
 
           {/* Card Content */}
-          <CardContent className="p-4">
+          <CardContent className="p-5">
             <h3 className="mb-1 line-clamp-1 text-lg font-medium text-gray-900">
               {listing.location}
             </h3>
@@ -90,7 +90,7 @@ const ListingCard = ({ listing, priority = false }: ListingCardProps) => {
             <div className="flex items-center justify-between">
               <Badge
                 variant="secondary"
-                className="bg-blue-100 text-blue-800 hover:bg-blue-200"
+                className="bg-blue-50 text-blue-600 hover:bg-blue-100"
                 aria-label={`${listing.bedrooms} bedrooms`}
               >
                 {listing.bedrooms} Bedroom{listing.bedrooms !== 1 && "s"}
@@ -104,7 +104,7 @@ const ListingCard = ({ listing, priority = false }: ListingCardProps) => {
           </CardContent>
 
           {/* Card Footer */}
-          <CardFooter className="flex items-center justify-between border-t border-gray-100 p-4 pt-0">
+          <CardFooter className="flex items-center justify-between border-t border-gray-100 px-5 pb-5 pt-2">
             <div className="flex items-center space-x-2">
               <span
                 className="text-sm text-gray-500"
@@ -112,14 +112,17 @@ const ListingCard = ({ listing, priority = false }: ListingCardProps) => {
               >
                 By{" "}
                 <span className="font-medium text-gray-700">
-                  {listing.landlordId.name}
+                  {typeof listing.landlordId === "object" &&
+                  listing.landlordId.name
+                    ? listing.landlordId.name
+                    : "Owner"}
                 </span>
               </span>
             </div>
 
             <Badge
               variant="outline"
-              className="border-gray-300 text-gray-700 hover:bg-gray-50"
+              className="border-blue-600 text-blue-600 hover:bg-blue-50"
               aria-hidden="true"
             >
               View Details

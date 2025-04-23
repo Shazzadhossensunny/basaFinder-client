@@ -148,10 +148,17 @@ const ListingFilters = () => {
         </Accordion>
 
         <div className="flex gap-2 pt-2">
-          <Button onClick={applyFilters} className="flex-1">
+          <Button
+            onClick={applyFilters}
+            className="flex-1 bg-blue-600 hover:bg-blue-700 text-white"
+          >
             Apply Filters
           </Button>
-          <Button variant="outline" onClick={resetFilters} className="flex-1">
+          <Button
+            variant="outline"
+            onClick={resetFilters}
+            className="flex-1 border-blue-600 text-blue-600 hover:bg-blue-50"
+          >
             Reset
           </Button>
         </div>

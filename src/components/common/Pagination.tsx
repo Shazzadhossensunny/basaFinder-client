@@ -32,7 +32,7 @@ const TablePagination = ({ totalPage }: { totalPage: number }) => {
         disabled={currentPage === 1}
         variant="outline"
         size="sm"
-        className="w-8 h-8 rounded-full flex items-center justify-center"
+        className="w-8 h-8 rounded-full flex items-center justify-center "
       >
         <ArrowLeft />
       </Button>
@@ -45,7 +45,7 @@ const TablePagination = ({ totalPage }: { totalPage: number }) => {
           key={index}
           variant={currentPage === index + 1 ? "default" : "outline"}
           size="sm"
-          className="w-8 h-8 rounded-full flex items-center justify-center"
+          className="w-8 h-8 rounded-full flex items-center justify-center bg-blue-600 hover:bg-blue-700 text-white"
         >
           {index + 1}
         </Button>

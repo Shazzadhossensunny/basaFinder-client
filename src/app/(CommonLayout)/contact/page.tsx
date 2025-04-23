@@ -1,3 +1,5 @@
+"use client";
+
 // app/contact/page.tsx
 import Image from "next/image";
 import Link from "next/link";
@@ -5,8 +7,42 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import dynamic from "next/dynamic";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
+
+// Dynamic import for map (SSR disabled)
+const Map = dynamic(() => import("../../../components/common/Map"), {
+  ssr: false,
+  loading: () => (
+    <div className="h-96 w-full bg-gray-200 rounded-xl animate-pulse" />
+  ),
+});
+
+type FormData = {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  message: string;
+};
 
 export default function ContactPage() {
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting, isValid },
+    reset,
+  } = useForm<FormData>({ mode: "onChange" });
+
+  const onSubmit = async (data: FormData) => {
+    // Simulate API call
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+
+    // Show success toast
+    toast.success("Message sent successfully!");
+    reset();
+  };
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
@@ -24,7 +60,7 @@ export default function ContactPage() {
               <Link href="/listings">
                 <Button
                   size="lg"
-                  className="bg-white text-blue-700 hover:bg-blue-50"
+                  className="bg-white text-blue-700 hover:bg-blue-50 cursor-pointer"
                 >
                   Browse Listings
                 </Button>
@@ -51,7 +87,7 @@ export default function ContactPage() {
               <h3 className="text-xl font-semibold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600">
                 Send Us a Message
               </h3>
-              <form className="space-y-6">
+              <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label
@@ -63,8 +99,15 @@ export default function ContactPage() {
                     <Input
                       id="firstName"
                       placeholder="Enter your first name"
-                      className="w-full"
+                      {...register("firstName", {
+                        required: "First name is required",
+                      })}
                     />
+                    {errors.firstName && (
+                      <p className="text-red-500 text-sm mt-1">
+                        {errors.firstName.message}
+                      </p>
+                    )}
                   </div>
                   <div>
                     <label
@@ -76,8 +119,15 @@ export default function ContactPage() {
                     <Input
                       id="lastName"
                       placeholder="Enter your last name"
-                      className="w-full"
+                      {...register("lastName", {
+                        required: "Last name is required",
+                      })}
                     />
+                    {errors.lastName && (
+                      <p className="text-red-500 text-sm mt-1">
+                        {errors.lastName.message}
+                      </p>
+                    )}
                   </div>
                 </div>
                 <div>
@@ -91,8 +141,19 @@ export default function ContactPage() {
                     id="email"
                     type="email"
                     placeholder="Enter your email address"
-                    className="w-full"
+                    {...register("email", {
+                      required: "Email is required",
+                      pattern: {
+                        value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                        message: "Invalid email address",
+                      },
+                    })}
                   />
+                  {errors.email && (
+                    <p className="text-red-500 text-sm mt-1">
+                      {errors.email.message}
+                    </p>
+                  )}
                 </div>
                 <div>
                   <label
@@ -104,8 +165,20 @@ export default function ContactPage() {
                   <Input
                     id="phone"
                     placeholder="Enter your phone number"
-                    className="w-full"
+                    {...register("phone", {
+                      required: "Phone number is required",
+                      pattern: {
+                        value:
+                          /^[+]?[(]?[0-9]{3}[)]?[-\s.]?[0-9]{3}[-\s.]?[0-9]{4,6}$/,
+                        message: "Invalid phone number",
+                      },
+                    })}
                   />
+                  {errors.phone && (
+                    <p className="text-red-500 text-sm mt-1">
+                      {errors.phone.message}
+                    </p>
+                  )}
                 </div>
                 <div>
                   <label
@@ -118,14 +191,30 @@ export default function ContactPage() {
                     id="message"
                     placeholder="How can we help you?"
                     rows={4}
-                    className="w-full"
+                    {...register("message", {
+                      required: "Message is required",
+                      minLength: {
+                        value: 10,
+                        message: "Message must be at least 10 characters",
+                      },
+                    })}
                   />
+                  {errors.message && (
+                    <p className="text-red-500 text-sm mt-1">
+                      {errors.message.message}
+                    </p>
+                  )}
                 </div>
-                <Button className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:from-blue-700 hover:to-purple-700">
-                  Send Message
+                <Button
+                  type="submit"
+                  className="w-full bg-blue-600 hover:bg-blue-700 text-white cursor-pointer"
+                  disabled={!isValid || isSubmitting}
+                >
+                  {isSubmitting ? "Sending..." : "Send Message"}
                 </Button>
               </form>
             </div>
+            {/* ... (keep existing contact info section) */}
             <div className="flex flex-col justify-between">
               <div>
                 <h3 className="text-xl font-semibold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600">
@@ -245,14 +334,7 @@ export default function ContactPage() {
       <section className="py-16 bg-gray-50">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-3xl font-bold mb-10 text-center">Find Us</h2>
-          <div className="relative h-96 w-full rounded-xl overflow-hidden shadow-lg">
-            <Image
-              src="/api/placeholder/1200/600"
-              alt="BasaFinder Office Location Map"
-              fill
-              className="object-cover"
-            />
-          </div>
+          <Map />
         </div>
       </section>
 
@@ -311,10 +393,10 @@ export default function ContactPage() {
               list your property, BasaFinder makes it simple and stress-free.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link href="/signup">
+              <Link href="/register">
                 <Button
                   size="lg"
-                  className="bg-white text-blue-600 hover:bg-blue-50"
+                  className="bg-white text-blue-600 hover:bg-blue-50 cursor-pointer"
                 >
                   Sign Up Now
                 </Button>
@@ -323,7 +405,7 @@ export default function ContactPage() {
                 <Button
                   size="lg"
                   variant="outline"
-                  className="border-white text-white hover:bg-white/10"
+                  className="border-white bg-transparent text-white hover:bg-white/10 cursor-pointer"
                 >
                   Browse Listings
                 </Button>

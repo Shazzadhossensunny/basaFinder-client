@@ -5,6 +5,7 @@ import SearchBar from "@/components/home/SearchBar";
 import { Button } from "@/components/ui/button";
 import { getAllListings } from "@/services/ListingService";
 import { Building, Phone, Star, Users } from "lucide-react";
+import Link from "next/link";
 type SearchParams = Promise<{ [key: string]: string | string[] | undefined }>;
 export default async function HomePage({
   searchParams,
@@ -168,7 +169,7 @@ export default async function HomePage({
         </div>
       </section>
       {/* CTA Section */}
-      <section className="py-12 md:py-16 bg-gradient-to-r from-blue-600 to-purple-600 text-white">
+      <section className="mb-16 py-12 md:py-16 bg-gradient-to-r from-blue-600 to-purple-600 text-white">
         <div className="container mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold mb-4">
             Ready to Find Your Perfect Home?
@@ -178,19 +179,23 @@ export default async function HomePage({
             and find the perfect place to call home.
           </p>
           <div className="flex flex-col sm:flex-row justify-center gap-4">
-            <Button
-              size="lg"
-              className="bg-white text-blue-600 hover:bg-blue-50"
-            >
-              Search Properties
-            </Button>
-            <Button
-              size="lg"
-              variant="outline"
-              className="border-white bg-transparent text-white hover:bg-white/10"
-            >
-              List Your Property
-            </Button>
+            <Link href="/listings">
+              <Button
+                size="lg"
+                className="bg-white text-blue-600 hover:bg-blue-50 cursor-pointer"
+              >
+                Search Properties
+              </Button>
+            </Link>
+            <Link href="/contact">
+              <Button
+                size="lg"
+                variant="outline"
+                className="border-white bg-transparent text-white hover:bg-white/10 cursor-pointer"
+              >
+                Contact Us
+              </Button>
+            </Link>
           </div>
         </div>
       </section>
