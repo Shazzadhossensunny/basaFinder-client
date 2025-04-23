@@ -254,11 +254,16 @@ export default function Profile() {
                       <Button
                         variant="outline"
                         type="button"
+                        className="cursor-pointer"
                         onClick={() => setIsEditing(false)}
                       >
                         Cancel
                       </Button>
-                      <Button type="submit" disabled={isSubmitting}>
+                      <Button
+                        type="submit"
+                        className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md cursor-pointer"
+                        disabled={isSubmitting}
+                      >
                         {isSubmitting ? (
                           <>
                             <Loader2 className="mr-2 h-4 w-4 animate-spin" />

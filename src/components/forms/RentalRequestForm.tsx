@@ -121,7 +121,9 @@ const RentalRequestModal: React.FC<RentalRequestModalProps> = ({
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button className="w-full">Request Rental</Button>
+        <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md cursor-pointer">
+          Request Rental
+        </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[600px]">
         <DialogHeader>
@@ -258,11 +260,16 @@ const RentalRequestModal: React.FC<RentalRequestModalProps> = ({
               <Button
                 type="button"
                 variant="outline"
+                className="cursor-pointer"
                 onClick={() => setIsOpen(false)}
               >
                 Cancel
               </Button>
-              <Button type="submit" disabled={isSubmitting}>
+              <Button
+                type="submit"
+                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md cursor-pointer"
+                disabled={isSubmitting}
+              >
                 {isSubmitting ? "Submitting..." : "Submit Request"}
               </Button>
             </div>
