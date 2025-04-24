@@ -128,7 +128,7 @@ export default function FAQsPage() {
                 <Link href="/contact">
                   <Button
                     size="lg"
-                    className="bg-white text-blue-700 hover:bg-blue-50"
+                    className="bg-white text-blue-700 hover:bg-blue-50 cursor-pointer"
                   >
                     Contact Support
                   </Button>
@@ -313,7 +313,7 @@ export default function FAQsPage() {
               <Link href="/contact">
                 <Button
                   size="lg"
-                  className="bg-white text-blue-600 hover:bg-blue-50"
+                  className="bg-white text-blue-600 hover:bg-blue-50 cursor-pointer"
                 >
                   Contact Us
                 </Button>
@@ -322,7 +322,7 @@ export default function FAQsPage() {
                 <Button
                   size="lg"
                   variant="outline"
-                  className="border-white text-white hover:bg-white/10"
+                  className="border-white text-white bg-transparent hover:bg-white/10 cursor-pointer"
                 >
                   Terms of Service
                 </Button>

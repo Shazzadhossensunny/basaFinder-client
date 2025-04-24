@@ -143,7 +143,7 @@ export default function TermsOfServicePage() {
 
             <div className="mt-10 pt-6 border-t border-gray-200">
               <p className="text-gray-600 text-sm">
-                Last updated: April 20, 2025
+                Last updated: April 25, 2025
               </p>
             </div>
           </div>
@@ -165,7 +165,7 @@ export default function TermsOfServicePage() {
               <Link href="/contact">
                 <Button
                   size="lg"
-                  className="bg-white text-blue-600 hover:bg-blue-50"
+                  className="bg-white text-blue-600 hover:bg-blue-50 cursor-pointer"
                 >
                   Contact Support
                 </Button>
@@ -174,7 +174,7 @@ export default function TermsOfServicePage() {
                 <Button
                   size="lg"
                   variant="outline"
-                  className="border-white text-white hover:bg-white/10"
+                  className="border-white text-white bg-transparent hover:bg-white/10 cursor-pointer"
                 >
                   Privacy Policy
                 </Button>
