@@ -192,7 +192,7 @@ export default function Profile() {
   return (
     <div className="container mx-auto p-4">
       <Card className="max-w-3xl mx-auto shadow-md">
-        <CardHeader className="bg-primary/5">
+        <CardHeader className="bg-primary/5 py-2">
           <div className="flex justify-between items-center">
             <div className="flex items-center gap-2">
               <User className="h-6 w-6 text-primary" />
@@ -200,7 +200,9 @@ export default function Profile() {
             </div>
             <Dialog open={isEditing} onOpenChange={setIsEditing}>
               <DialogTrigger asChild>
-                <Button variant="outline">Edit Profile</Button>
+                <Button variant="outline" className="cursor-pointer">
+                  Edit Profile
+                </Button>
               </DialogTrigger>
               <DialogContent>
                 <DialogHeader>

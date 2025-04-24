@@ -8,7 +8,7 @@ export default function ChangePasswordPage() {
   return (
     <div className="container mx-auto p-4">
       <Card className="max-w-md mx-auto shadow-md">
-        <CardHeader className="bg-primary/5">
+        <CardHeader className="bg-primary/5 py-2">
           <CardTitle>Change Password</CardTitle>
         </CardHeader>
         <CardContent className="pt-6">

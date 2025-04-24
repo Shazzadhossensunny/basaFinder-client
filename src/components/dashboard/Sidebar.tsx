@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import Link from "next/link";
 import {
   Home,
   FileText,
@@ -57,11 +58,18 @@ const Sidebar: React.FC<SidebarProps> = ({
   const getMenuItems = (): MenuItem[] => {
     const rolePath = getRolePath();
 
+    // Always include Home as the first item
     const baseItems: MenuItem[] = [
+      {
+        id: "home",
+        label: "Home",
+        icon: <Home className="h-5 w-5" />,
+        path: "/",
+      },
       {
         id: "dashboard",
         label: "Dashboard",
-        icon: <Home className="h-5 w-5" />,
+        icon: <FileText className="h-5 w-5" />,
         path: rolePath,
       },
     ];
@@ -93,21 +101,6 @@ const Sidebar: React.FC<SidebarProps> = ({
             label: "My Listings",
             icon: <Home className="h-5 w-5" />,
             path: `${rolePath}/listings`,
-
-            // submenu: [
-            //   {
-            //     id: "create-listing",
-            //     label: "Create Listing",
-            //     path: `${rolePath}/listings/create`,
-            //     icon: <PlusCircle className="h-4 w-4" />,
-            //   },
-            //   {
-            //     id: "manage-listings",
-            //     label: "Manage Listings",
-            //     path: `${rolePath}/listings`,
-            //     icon: <List className="h-4 w-4" />,
-            //   },
-            // ],
           },
           {
             id: "manage-listings",
@@ -125,6 +118,12 @@ const Sidebar: React.FC<SidebarProps> = ({
       case "tenant":
         return [
           ...baseItems,
+          {
+            id: "explore",
+            label: "Explore Listings",
+            icon: <Home className="h-5 w-5" />,
+            path: "/listings",
+          },
           {
             id: "my-requests",
             label: "My Requests",
@@ -184,7 +183,7 @@ const Sidebar: React.FC<SidebarProps> = ({
       >
         <div className="flex flex-col h-full">
           <div className="p-6 border-b dark:border-gray-700">
-            <span className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 text-transparent bg-clip-text">
+            <span className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 text-transparent bg-clip-text">
               {user.role.charAt(0).toUpperCase() + user.role.slice(1)} Dashboard
             </span>
           </div>
@@ -197,7 +196,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                     <div className="space-y-2">
                       <Button
                         variant="ghost"
-                        className="w-full justify-between"
+                        className="w-full justify-between cursor-pointer"
                         onClick={() => toggleSubmenu(item.id)}
                       >
                         <div className="flex items-center">
@@ -220,9 +219,9 @@ const Sidebar: React.FC<SidebarProps> = ({
                                     ? "default"
                                     : "ghost"
                                 }
-                                className={`w-full justify-start text-sm ${
+                                className={`w-full justify-start text-sm cursor-pointer ${
                                   pathname === subitem.path
-                                    ? "bg-purple-600 text-white hover:bg-purple-700"
+                                    ? "bg-blue-600 text-white hover:bg-blue-700"
                                     : ""
                                 }`}
                                 onClick={() => handleNavigation(subitem.path)}
@@ -238,15 +237,15 @@ const Sidebar: React.FC<SidebarProps> = ({
                   ) : (
                     <Button
                       variant={pathname === item.path ? "default" : "ghost"}
-                      className={`w-full justify-start ${
+                      className={`w-full justify-start cursor-pointer ${
                         pathname === item.path
-                          ? "bg-purple-600 text-white hover:bg-purple-700"
+                          ? "bg-blue-600 text-white hover:bg-blue-700"
                           : ""
                       }`}
                       onClick={() => handleNavigation(item.path)}
                     >
                       {item.icon}
-                      <span className="ml-1">{item.label}</span>
+                      <span className="ml-3">{item.label}</span>
                     </Button>
                   )}
                 </li>
@@ -258,7 +257,7 @@ const Sidebar: React.FC<SidebarProps> = ({
             <div className="relative">
               <Button
                 variant="ghost"
-                className="w-full justify-between items-center"
+                className="w-full justify-between items-center cursor-pointer"
                 onClick={() => setIsProfileOpen(!isProfileOpen)}
               >
                 <div className="flex items-center min-w-0 flex-1">
@@ -271,8 +270,8 @@ const Sidebar: React.FC<SidebarProps> = ({
                       className="w-8 h-8 rounded-full"
                     />
                   ) : (
-                    <div className="w-8 h-8 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
-                      <User className="h-4 w-4 text-purple-600 dark:text-purple-400" />
+                    <div className="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
+                      <User className="h-4 w-4 text-blue-600 dark:text-blue-400" />
                     </div>
                   )}
                   <div className="ml-3 min-w-0 flex-1">
@@ -291,31 +290,9 @@ const Sidebar: React.FC<SidebarProps> = ({
 
               {isProfileOpen && (
                 <div className="absolute bottom-full left-0 right-0 mb-2 bg-white dark:bg-gray-800 rounded-lg shadow-lg space-y-1">
-                  {/* <Button
-                    variant="ghost"
-                    className="w-full justify-start"
-                    onClick={() => {
-                      handleNavigation(`${getRolePath()}/profile`);
-                      setIsProfileOpen(false);
-                    }}
-                  >
-                    <UserCog className="h-4 w-4 mr-3" />
-                    Edit Profile
-                  </Button> */}
-                  {/* <Button
-                    variant="ghost"
-                    className="w-full justify-start"
-                    onClick={() => {
-                      handleNavigation(`${getRolePath()}/change-password`);
-                      setIsProfileOpen(false);
-                    }}
-                  >
-                    <Lock className="h-4 w-4 mr-3" />
-                    Change Password
-                  </Button> */}
                   <Button
                     variant="ghost"
-                    className="w-full justify-start text-red-600 dark:text-red-400"
+                    className="w-full justify-start text-red-600 dark:text-red-400 cursor-pointer"
                     onClick={handleLogout}
                   >
                     <LogOut className="h-4 w-4 mr-3" />
@@ -334,7 +311,7 @@ const Sidebar: React.FC<SidebarProps> = ({
             <Button
               variant="ghost"
               size="sm"
-              className="lg:hidden"
+              className="lg:hidden cursor-pointer"
               onClick={() => setIsSidebarOpen(!isSidebarOpen)}
             >
               {isSidebarOpen ? "Close" : "Menu"}
