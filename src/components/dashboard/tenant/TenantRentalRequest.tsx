@@ -25,7 +25,13 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Loader2, Eye, CreditCard, PhoneOutgoing } from "lucide-react";
+import {
+  Loader2,
+  Eye,
+  CreditCard,
+  PhoneOutgoing,
+  CheckCircle2,
+} from "lucide-react";
 import { toast } from "sonner";
 import { format } from "date-fns";
 import {
@@ -33,35 +39,48 @@ import {
   getRequestById,
   initiateRequestPayment,
 } from "@/services/RequestService";
-import { initiatePayment } from "@/services/PaymentService";
+import Link from "next/link";
 
-export enum PaymentStatus {
-  PENDING = "pending",
-  COMPLETED = "completed",
-  FAILED = "failed",
-}
+export type PaymentStatus = "pending" | "paid" | "failed";
 
-// Define types
-interface IRequest {
+export interface IRequest {
   _id: string;
-  listingId: {
-    _id: string;
-    bedrooms: number;
-    images: string[];
-    rent: number;
-    location: string;
-  };
+  status: "pending" | "approved" | "rejected";
+  paymentStatus: PaymentStatus;
+  paymentInitiated: boolean;
+  createdAt: string;
+  updatedAt: string;
+  message: string;
+  moveInDate: string;
+  rentalDuration: number;
+  specialRequirements: string;
+  landlordPhoneNumber: string | null;
+
+  // Tenant Info
   tenantId: {
     _id: string;
     name: string;
     email: string;
     phoneNumber?: string;
   };
-  message: string;
-  status: "pending" | "approved" | "rejected";
-  createdAt: string;
-  updatedAt: string;
-  paymentStatus?: PaymentStatus;
+
+  // Listing Info
+  listingId: {
+    _id: string;
+    location: string;
+    rent: number;
+    bedrooms: number;
+    images: string[];
+  } | null;
+
+  // Payment Info
+  paymentInfo?: {
+    status: string;
+    transactionId: string;
+    amount: number;
+    currency: string;
+    paidAt: string;
+  };
 }
 
 const TenantRentalRequests = () => {
@@ -71,34 +90,42 @@ const TenantRentalRequests = () => {
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [paymentDialogOpen, setPaymentDialogOpen] = useState(false);
   const [processingPayment, setProcessingPayment] = useState(false);
+  const [paymentSuccess, setPaymentSuccess] = useState(false);
 
-  // Fetch requests
-  useEffect(() => {
-    const fetchRequests = async () => {
-      try {
-        setLoading(true);
-        const response = await getTenantRequests();
-        if (response.success) {
-          setRequests(response.data || []);
-        } else {
-          toast.error(
-            response.message || "Failed to fetch your rental requests"
-          );
-        }
-      } catch (error) {
-        toast.error("An error occurred while fetching requests");
-        console.error(error);
-      } finally {
-        setLoading(false);
+  const fetchRequests = async () => {
+    try {
+      setLoading(true);
+      const response = await getTenantRequests();
+      if (response.success) {
+        setRequests(response.data || []);
+      } else {
+        toast.error(response.message || "Failed to fetch your rental requests");
       }
-    };
+    } catch (error) {
+      toast.error("An error occurred while fetching requests");
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  useEffect(() => {
     fetchRequests();
   }, []);
 
-  console.log(requests);
+  // Poll for payment status updates (simulate real-time updates)
+  useEffect(() => {
+    // Only poll when payment is initiated but not yet confirmed
+    if (paymentSuccess) {
+      const timer = setTimeout(() => {
+        fetchRequests();
+        setPaymentSuccess(false);
+      }, 3000);
 
-  // View request details
+      return () => clearTimeout(timer);
+    }
+  }, [paymentSuccess]);
+
   const handleViewDetails = async (requestId: string) => {
     try {
       const response = await getRequestById(requestId);
@@ -113,42 +140,60 @@ const TenantRentalRequests = () => {
     }
   };
 
-  // Process payment
   const handlePayment = async () => {
     if (!selectedRequest) return;
 
     try {
       setProcessingPayment(true);
-      //   const response = await initiatePayment(selectedRequest._id);
-
       const response = await initiateRequestPayment(selectedRequest._id);
       if (response.data.paymentUrl) {
         toast.success("Payment initiated successfully");
-        toast.info("You would now be redirected to the payment gateway");
 
-        setTimeout(() => {
-          const newTab = window.open(response.data.paymentUrl, "_blank");
+        // Open payment window
+        const paymentWindow = window.open(response.data.paymentUrl, "_blank");
 
-          if (!newTab) {
-            // Fallback if the browser blocks new tabs
-            window.location.href = response.data.paymentUrl;
-          }
-
-          return;
-        }, 1000);
-
-        // Update local state to reflect payment is in progress
+        // Update request status immediately
         setRequests(
           requests.map((req) =>
             req._id === selectedRequest._id
-              ? { ...req, paymentInitiated: true }
+              ? {
+                  ...req,
+                  paymentInitiated: true,
+                  paymentStatus: "pending",
+                }
               : req
           )
         );
 
+        // Set up listener for payment completion (in a real app this would be via webhook)
+        const checkPaymentCompletion = () => {
+          // Simulate payment completion after 5 seconds (in a real app this would be via API)
+          setTimeout(async () => {
+            // Fetch updated request status
+            const updatedResponse = await getRequestById(selectedRequest._id);
+            if (updatedResponse.success) {
+              const updatedRequest = updatedResponse.data;
+
+              // Update the request in the state
+              setRequests(
+                requests.map((req) =>
+                  req._id === selectedRequest._id ? updatedRequest : req
+                )
+              );
+
+              // Update the selected request if dialog is still open
+              setSelectedRequest(updatedRequest);
+
+              setPaymentSuccess(true);
+              toast.success("Payment completed successfully!");
+            }
+          }, 5000);
+        };
+
+        checkPaymentCompletion();
+
+        // Close the payment dialog
         setPaymentDialogOpen(false);
-      } else {
-        toast.error(response.message || "Failed to initiate payment");
       }
     } catch (error) {
       toast.error("An error occurred while processing payment");
@@ -157,36 +202,94 @@ const TenantRentalRequests = () => {
     }
   };
 
-  // Render badge based on status
-  const renderStatusBadge = (status: string) => {
+  const getStatusLabel = (status: string) => {
     switch (status) {
       case "pending":
-        return (
-          <Badge variant="outline" className="bg-yellow-100 text-yellow-800">
-            Pending
-          </Badge>
-        );
+        return "Pending Review";
       case "approved":
-        return (
-          <Badge variant="outline" className="bg-green-100 text-green-800">
-            Approved
-          </Badge>
-        );
+        return "Approved";
       case "rejected":
-        return (
-          <Badge variant="outline" className="bg-red-100 text-red-800">
-            Rejected
-          </Badge>
-        );
+        return "Rejected";
       case "paid":
-        return (
-          <Badge variant="outline" className="bg-purple-100 text-purple-800">
-            Paid
-          </Badge>
-        );
+        return "Payment Complete";
       default:
-        return <Badge variant="outline">{status}</Badge>;
+        return status;
     }
+  };
+
+  const getStatusDescription = (status: string) => {
+    switch (status) {
+      case "pending":
+        return "Waiting for landlord approval";
+      case "approved":
+        return "Ready for payment";
+      case "rejected":
+        return "Request denied by landlord";
+      case "paid":
+        return "Rental payment completed";
+      default:
+        return "";
+    }
+  };
+
+  const renderStatusBadge = (
+    status: string,
+    type: "request" | "payment" = "request"
+  ) => {
+    const label = getStatusLabel(status);
+    const description = getStatusDescription(status);
+
+    let bgColor = "bg-gray-100";
+    let textColor = "text-gray-800";
+
+    switch (status) {
+      case "pending":
+        bgColor = "bg-yellow-100";
+        textColor = "text-yellow-800";
+        break;
+      case "approved":
+        bgColor = "bg-green-100";
+        textColor = "text-green-800";
+        break;
+      case "rejected":
+        bgColor = "bg-red-100";
+        textColor = "text-red-800";
+        break;
+      case "paid":
+        bgColor = "bg-purple-100";
+        textColor = "text-purple-800";
+        break;
+    }
+
+    return (
+      <div className="flex flex-col">
+        <Badge
+          variant="outline"
+          className={`${bgColor} ${textColor} flex items-center gap-1`}
+          title={description}
+        >
+          {type === "payment" && status === "paid" && (
+            <CheckCircle2 className="h-3 w-3" />
+          )}
+          {label}
+        </Badge>
+        {type === "request" && (
+          <span className="text-xs text-gray-500 mt-1">{description}</span>
+        )}
+      </div>
+    );
+  };
+
+  const isPaymentComplete = (request: IRequest) => {
+    return (
+      request.paymentStatus === "paid" ||
+      (request.paymentInfo && request.paymentInfo.status === "paid")
+    );
+  };
+
+  const handleOpenPaymentDialog = (request: IRequest) => {
+    setSelectedRequest(request);
+    setPaymentDialogOpen(true);
   };
 
   if (loading) {
@@ -212,62 +315,80 @@ const TenantRentalRequests = () => {
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <Table>
+            <Table className="min-w-full">
               <TableHeader>
                 <TableRow>
-                  <TableHead>Property</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Date</TableHead>
-                  <TableHead>Actions</TableHead>
+                  <TableHead className="w-1/3">Property</TableHead>
+                  <TableHead className="w-1/3">Status</TableHead>
+                  <TableHead className="w-1/6">Date</TableHead>
+                  <TableHead className="w-1/6">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {requests.map((request) => (
                   <TableRow key={request._id}>
                     <TableCell className="font-medium">
-                      {request.listingId?.images[0] || "Unknown Property"}
-                    </TableCell>
-                    <TableCell>{renderStatusBadge(request.status)}</TableCell>
-                    <TableCell>
-                      {format(new Date(request.createdAt), "PPP")}
+                      {request.listingId?.location || "Unknown Property"}
                     </TableCell>
                     <TableCell>
-                      <div className="flex space-x-2">
+                      <div className="space-y-2">
+                        {renderStatusBadge(request.status, "request")}
+                        {request.paymentStatus &&
+                          renderStatusBadge(request.paymentStatus, "payment")}
+                      </div>
+                    </TableCell>
+                    <TableCell className="whitespace-nowrap">
+                      {format(new Date(request.createdAt), "dd MMM yyyy")}
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex flex-wrap gap-2">
                         <Button
                           variant="outline"
                           size="icon"
+                          className="cursor-pointer"
                           onClick={() => handleViewDetails(request._id)}
+                          title="View Details"
                         >
                           <Eye className="h-4 w-4" />
                         </Button>
 
-                        {request.status === "approved" &&
-                          request.paymentStatus && (
-                            <Button
-                              variant="outline"
-                              size="icon"
-                              className="text-purple-600"
-                              onClick={() => {
-                                setSelectedRequest(request);
-                                setPaymentDialogOpen(true);
-                              }}
-                            >
+                        {request.status === "approved" && (
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            className={
+                              isPaymentComplete(request)
+                                ? "text-green-600 border-green-200 bg-green-50 cursor-pointer"
+                                : "text-purple-600 cursor-pointer"
+                            }
+                            onClick={() => handleOpenPaymentDialog(request)}
+                            title={
+                              isPaymentComplete(request)
+                                ? "Payment Complete"
+                                : "Make Payment"
+                            }
+                          >
+                            {isPaymentComplete(request) ? (
+                              <CheckCircle2 className="h-4 w-4" />
+                            ) : (
                               <CreditCard className="h-4 w-4" />
-                            </Button>
-                          )}
+                            )}
+                          </Button>
+                        )}
 
-                        {request.status === "approved" &&
-                          request.landlordPhoneNumber && (
-                            <Button
-                              variant="outline"
-                              size="icon"
-                              className="text-blue-600"
-                              as="a"
-                              href={`tel:${request.landlordPhoneNumber}`}
-                            >
+                        {request.landlordPhoneNumber && (
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            className="text-blue-600"
+                            asChild
+                            title="Call Landlord"
+                          >
+                            <Link href={`tel:${request.landlordPhoneNumber}`}>
                               <PhoneOutgoing className="h-4 w-4" />
-                            </Button>
-                          )}
+                            </Link>
+                          </Button>
+                        )}
                       </div>
                     </TableCell>
                   </TableRow>
@@ -280,7 +401,7 @@ const TenantRentalRequests = () => {
 
       {/* Request Details Dialog */}
       <Dialog open={detailsOpen} onOpenChange={setDetailsOpen}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="sm:max-w-md max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Request Details</DialogTitle>
           </DialogHeader>
@@ -288,78 +409,64 @@ const TenantRentalRequests = () => {
             <div className="space-y-4">
               <div>
                 <h3 className="font-medium">Property</h3>
-                <p>{selectedRequest.listingId?.images[0]}</p>
+                <p>
+                  {selectedRequest.listingId?.location || "Unknown Property"}
+                </p>
                 <p className="text-sm text-muted-foreground">
-                  {selectedRequest.listingId?.location} - $
-                  {selectedRequest.listingId?.rent}/month
+                  ${selectedRequest.listingId?.rent}/month -{" "}
+                  {selectedRequest.listingId?.bedrooms} bedrooms
                 </p>
               </div>
 
               <div>
-                <h3 className="font-medium">Landlord</h3>
-                <p>{selectedRequest.landlordId?.name}</p>
-                {selectedRequest.status === "approved" &&
-                  selectedRequest.landlord?.phone && (
-                    <div className="flex items-center mt-1">
-                      <p className="text-sm text-muted-foreground mr-2">
-                        Contact: {selectedRequest.landlord.phone}
-                      </p>
-                      <a
-                        href={`tel:${requests.landlord.phone}`}
-                        className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-input bg-background text-blue-600 hover:bg-accent hover:text-accent-foreground"
-                      >
-                        <PhoneOutgoing className="h-4 w-4" />
-                      </a>
-                    </div>
-                  )}
+                <h3 className="font-medium">Landlord Contact</h3>
+                <p className="text-sm text-muted-foreground">
+                  {selectedRequest.landlordPhoneNumber || "No contact provided"}
+                </p>
               </div>
 
               <div>
-                <h3 className="font-medium">Your Request</h3>
+                <h3 className="font-medium">Move-in Date</h3>
+                <p className="text-sm">
+                  {format(new Date(selectedRequest.moveInDate), "PPP")}
+                </p>
+              </div>
+
+              <div>
+                <h3 className="font-medium">Special Requirements</h3>
                 <p className="text-sm whitespace-pre-line">
-                  {selectedRequest.message}
+                  {selectedRequest.specialRequirements || "None"}
                 </p>
               </div>
 
               <div>
                 <h3 className="font-medium">Status</h3>
-                <div className="mt-1">
-                  {renderStatusBadge(selectedRequest.status)}
-                </div>
-                {selectedRequest.status === "approved" && (
-                  <p className="text-sm mt-2 text-green-600">
-                    Your request has been approved!{" "}
-                    {selectedRequest.paymentInitiated
-                      ? "You can now proceed with payment."
-                      : "Waiting for the landlord to initiate payment request."}
-                  </p>
-                )}
-                {selectedRequest.status === "rejected" && (
-                  <p className="text-sm mt-2 text-red-600">
-                    Unfortunately, your request has been rejected.
-                  </p>
-                )}
-              </div>
-
-              {selectedRequest.status === "approved" &&
-                selectedRequest.paymentInitiated && (
-                  <div className="mt-4">
-                    <Button
-                      className="w-full"
-                      onClick={() => {
-                        setDetailsOpen(false);
-                        setPaymentDialogOpen(true);
-                      }}
-                    >
-                      <CreditCard className="h-4 w-4 mr-2" />
-                      Pay Rent
-                    </Button>
+                <div className="mt-1 space-y-2">
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm w-24">Request:</span>
+                    {renderStatusBadge(selectedRequest.status)}
                   </div>
-                )}
+
+                  {selectedRequest.paymentStatus && (
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm w-24">Payment:</span>
+                      {renderStatusBadge(
+                        selectedRequest.paymentStatus,
+                        "payment"
+                      )}
+                    </div>
+                  )}
+                </div>
+              </div>
             </div>
           )}
           <DialogFooter>
-            <Button onClick={() => setDetailsOpen(false)}>Close</Button>
+            <Button
+              className="cursor-pointer"
+              onClick={() => setDetailsOpen(false)}
+            >
+              Close
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -368,61 +475,110 @@ const TenantRentalRequests = () => {
       <Dialog open={paymentDialogOpen} onOpenChange={setPaymentDialogOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>Complete Rental Payment</DialogTitle>
+            <DialogTitle>
+              {selectedRequest && isPaymentComplete(selectedRequest)
+                ? "Payment Complete"
+                : "Complete Rental Payment"}
+            </DialogTitle>
             <DialogDescription>
-              Pay your rental fee to finalize the agreement
+              {selectedRequest && isPaymentComplete(selectedRequest)
+                ? "Your payment has been successfully processed"
+                : "Pay your rental fee to finalize the agreement"}
             </DialogDescription>
           </DialogHeader>
           {selectedRequest && (
             <div className="space-y-4">
               <div>
                 <h3 className="font-medium">Property</h3>
-                <p>{selectedRequest.listing?.title}</p>
+                <p>
+                  {selectedRequest.listingId?.location || "Unknown Property"}
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  ${selectedRequest.listingId?.rent}/month
+                </p>
               </div>
 
               <div>
-                <h3 className="font-medium">Landlord</h3>
-                <p>{selectedRequest.landlord?.name}</p>
-              </div>
-
-              <div>
-                <h3 className="font-medium">Payment Amount</h3>
-                <p className="text-lg font-bold">
-                  ${selectedRequest.listing?.price}
-                </p>
-                <p className="text-xs text-muted-foreground">
-                  First month's rent
-                </p>
-              </div>
-
-              {/* Payment method selection would go here in a real app */}
-              <div className="p-4 bg-gray-50 rounded-md text-center">
-                <p>Payment gateway integration would appear here</p>
-                <p className="text-xs text-muted-foreground">
-                  In a production app, you would be redirected to a secure
-                  payment form
-                </p>
+                <h3 className="font-medium">Payment Details</h3>
+                {isPaymentComplete(selectedRequest) ? (
+                  <div className="space-y-3 p-4 bg-green-50 border border-green-200 rounded-md">
+                    <div className="flex items-center gap-2 text-green-600">
+                      <CheckCircle2 className="h-5 w-5" />
+                      <span className="font-medium">Payment Completed</span>
+                    </div>
+                    {selectedRequest.paymentInfo && (
+                      <>
+                        <p>
+                          Amount: ${selectedRequest.paymentInfo.amount}{" "}
+                          {selectedRequest.paymentInfo.currency}
+                        </p>
+                        <p>
+                          Paid at:{" "}
+                          {format(
+                            new Date(selectedRequest.paymentInfo.paidAt),
+                            "PPP"
+                          )}
+                        </p>
+                        <p>
+                          Transaction ID:{" "}
+                          <span className="font-mono text-xs">
+                            {selectedRequest.paymentInfo.transactionId}
+                          </span>
+                        </p>
+                      </>
+                    )}
+                  </div>
+                ) : (
+                  <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-md">
+                    <p className="text-sm text-yellow-800">
+                      {selectedRequest.listingId?.rent
+                        ? `Payment of $${selectedRequest.listingId.rent} is required to finalize your rental agreement.`
+                        : "Payment is required to finalize your rental agreement."}
+                    </p>
+                  </div>
+                )}
               </div>
             </div>
           )}
           <DialogFooter className="sm:justify-end">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => setPaymentDialogOpen(false)}
-            >
-              Cancel
-            </Button>
-            <Button
-              type="button"
-              onClick={handlePayment}
-              disabled={processingPayment}
-            >
-              {processingPayment && (
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              )}
-              Process Payment
-            </Button>
+            {selectedRequest && isPaymentComplete(selectedRequest) ? (
+              <Button
+                type="button"
+                className="cursor-pointer"
+                onClick={() => setPaymentDialogOpen(false)}
+              >
+                Close
+              </Button>
+            ) : (
+              <>
+                <Button
+                  type="button"
+                  className="cursor-pointer"
+                  variant="outline"
+                  onClick={() => setPaymentDialogOpen(false)}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="button"
+                  className="bg-blue-600 hover:bg-blue-700 text-white cursor-pointer"
+                  onClick={handlePayment}
+                  disabled={Boolean(
+                    processingPayment ||
+                      (selectedRequest && isPaymentComplete(selectedRequest))
+                  )}
+                >
+                  {processingPayment ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Processing...
+                    </>
+                  ) : (
+                    "Process Payment"
+                  )}
+                </Button>
+              </>
+            )}
           </DialogFooter>
         </DialogContent>
       </Dialog>

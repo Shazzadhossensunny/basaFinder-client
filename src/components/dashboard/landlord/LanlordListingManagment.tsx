@@ -126,7 +126,10 @@ export default function LandlordListings() {
       <div className="space-y-6">
         <div className="flex justify-between items-center">
           <h2 className="text-3xl font-bold tracking-tight">My Listings</h2>
-          <Button onClick={handleCreateListing}>
+          <Button
+            className="bg-blue-600 hover:bg-blue-700 text-white cursor-pointer"
+            onClick={handleCreateListing}
+          >
             <Plus className="mr-2 h-4 w-4" /> Add New Listing
           </Button>
         </div>
@@ -214,6 +217,7 @@ export default function LandlordListings() {
                               <Button
                                 variant="outline"
                                 size="sm"
+                                className="cursor-pointer"
                                 onClick={() => handleViewListing(listing._id)}
                               >
                                 <Eye className="h-4 w-4" />
@@ -222,6 +226,7 @@ export default function LandlordListings() {
                               <Button
                                 variant="outline"
                                 size="sm"
+                                className="cursor-pointer"
                                 onClick={() => handleEditListing(listing._id)}
                               >
                                 <Edit className="h-4 w-4" />
@@ -230,7 +235,7 @@ export default function LandlordListings() {
                               <Button
                                 variant="outline"
                                 size="sm"
-                                className="text-red-500 hover:text-red-600"
+                                className="text-red-500 hover:text-red-600 cursor-pointer"
                                 onClick={() => handleDeleteClick(listing)}
                               >
                                 <Trash2 className="h-4 w-4" />
@@ -262,6 +267,7 @@ export default function LandlordListings() {
             <Button
               variant="outline"
               onClick={() => setDeleteDialogOpen(false)}
+              className="cursor-pointer"
               disabled={!!deletingId}
             >
               Cancel
@@ -269,6 +275,7 @@ export default function LandlordListings() {
             <Button
               variant="destructive"
               onClick={handleDeleteConfirm}
+              className="cursor-pointer"
               disabled={!!deletingId}
             >
               {deletingId === selectedListing?._id ? (

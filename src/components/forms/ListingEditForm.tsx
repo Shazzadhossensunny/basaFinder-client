@@ -279,11 +279,17 @@ export default function EditListingForm() {
                 <Button
                   type="button"
                   variant="outline"
+                  className="cursor-pointer"
                   onClick={() => router.back()}
                 >
                   Cancel
                 </Button>
-                <Button type="submit">Save Changes</Button>
+                <Button
+                  type="submit"
+                  className="bg-blue-600 hover:bg-blue-700 text-white cursor-pointer"
+                >
+                  Save Changes
+                </Button>
               </div>
             </form>
           </Form>

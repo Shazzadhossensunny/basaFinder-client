@@ -299,7 +299,11 @@ const CreateListing = () => {
               />
 
               <CardFooter className="flex justify-end pt-6 px-0">
-                <Button type="submit" disabled={isSubmitting}>
+                <Button
+                  type="submit"
+                  className="bg-blue-600 hover:bg-blue-700 text-white cursor-pointer"
+                  disabled={isSubmitting}
+                >
                   {isSubmitting ? "Creating..." : "Create Listing"}
                 </Button>
               </CardFooter>

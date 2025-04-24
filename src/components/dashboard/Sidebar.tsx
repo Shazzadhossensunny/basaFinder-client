@@ -96,12 +96,12 @@ const Sidebar: React.FC<SidebarProps> = ({
       case "landlord":
         return [
           ...baseItems,
-          {
-            id: "my-listings",
-            label: "My Listings",
-            icon: <Home className="h-5 w-5" />,
-            path: `${rolePath}/listings`,
-          },
+          // {
+          //   id: "my-listings",
+          //   label: "My Listings",
+          //   icon: <Home className="h-5 w-5" />,
+          //   path: `${rolePath}/listings`,
+          // },
           {
             id: "manage-listings",
             label: "Manage Listings",
