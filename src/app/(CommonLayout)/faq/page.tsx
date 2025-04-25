@@ -123,7 +123,7 @@ export default function FAQsPage() {
               you're a tenant looking for your next home or a property owner
               listing your space.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4">
+            {/* <div className="flex flex-col sm:flex-row gap-4">
               <Link href="/contact">
                 <Button
                   size="lg"
@@ -132,7 +132,7 @@ export default function FAQsPage() {
                   Contact Support
                 </Button>
               </Link>
-            </div>
+            </div> */}
           </div>
         </div>
       </div>
