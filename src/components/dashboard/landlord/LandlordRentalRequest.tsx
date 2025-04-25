@@ -414,7 +414,11 @@ const LandlordRentalRequests = () => {
             >
               Cancel
             </Button>
-            <Button type="button" onClick={handleApprove}>
+            <Button
+              type="button"
+              className="bg-blue-600 hover:bg-blue-700 text-white cursor-pointer"
+              onClick={handleApprove}
+            >
               Approve Request
             </Button>
           </DialogFooter>

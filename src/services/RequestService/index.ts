@@ -73,7 +73,7 @@ export const getRequestById = async (id: string) => {
       `${process.env.NEXT_PUBLIC_BASE_API}/request/${id}`,
       {
         next: {
-          tags: ["REQUESTS"],
+          tags: ["REQUESTS", "PAYMENTS"],
         },
         headers: {
           Authorization: (await cookies()).get("accessToken")!.value,
@@ -122,6 +122,7 @@ export const initiateRequestPayment = async (requestId: string) => {
       }
     );
     revalidateTag("REQUESTS");
+    revalidateTag("PAYMENTS");
     return res.json();
   } catch (error: any) {
     return Error(error.message);
@@ -142,6 +143,7 @@ export const updatePaymentStatus = async (id: string, paymentData: any) => {
       }
     );
     revalidateTag("REQUESTS");
+    revalidateTag("PAYMENTS");
     return res.json();
   } catch (error: any) {
     return Error(error.message);

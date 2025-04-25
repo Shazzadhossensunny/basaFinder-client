@@ -1,7 +1,7 @@
 "use client";
 import { JSX, useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { getAllUsers } from "@/services/UserService";
+import { getAllUsers, getUserById } from "@/services/UserService";
 import {
   CircleUserRound,
   Home,
@@ -25,6 +25,16 @@ import { Button } from "@/components/ui/button";
 import { getAllListings } from "@/services/ListingService";
 import { getLandlordRequests } from "@/services/RequestService";
 import { getAllPaymentsByUser } from "@/services/PaymentService";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+
+interface UserData {
+  name: string;
+  email: string;
+  phoneNumber: string;
+  role: string;
+  createdAt: string;
+  updatedAt: string;
+}
 
 export default function AdminDashboard() {
   const { user, isLoading: userLoading } = useUser();
@@ -36,6 +46,7 @@ export default function AdminDashboard() {
     totalRevenue: 0,
   });
   const [loading, setLoading] = useState(true);
+  const [userData2, setUserData2] = useState<UserData | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [userGrowth, setUserGrowth] = useState<
     { month: string; count: number }[]
@@ -45,19 +56,28 @@ export default function AdminDashboard() {
     try {
       setLoading(true);
       setError(null);
+      const currentUserId = user?.userId;
+
+      if (!currentUserId) throw new Error("User ID not found");
 
       // Use Promise.all to fetch data in parallel
       const [
+        currentUserResponse,
         usersResponse,
         listingsResponse,
         requestsResponse,
         paymentsResponse,
       ] = await Promise.all([
+        getUserById(currentUserId),
         getAllUsers(),
         getAllListings("1", "1000"),
         getLandlordRequests(),
         getAllPaymentsByUser("admin"),
       ]);
+
+      if (currentUserResponse.success) {
+        setUserData2(currentUserResponse.data);
+      }
 
       // Process data safely even if some responses fail
       // Extract data with fallbacks for each response
@@ -150,24 +170,26 @@ export default function AdminDashboard() {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
+      {/* Header Section */}
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 bg-gradient-to-r from-blue-100 to-indigo-50 p-6 rounded-lg shadow-sm">
         <div>
-          <h1 className="text-3xl font-bold">Admin Dashboard</h1>
-          <p className="text-muted-foreground">
-            Real-time system overview and analytics
-          </p>
+          <h1 className="text-3xl font-bold mb-2">
+            Welcome back, {userData2?.name?.toUpperCase() || "USER"}
+          </h1>
         </div>
-        <Button
-          onClick={fetchDashboardData}
-          variant="ghost"
-          size="sm"
-          disabled={loading}
-        >
-          <RefreshCw
-            className={`mr-2 h-4 w-4 ${loading ? "animate-spin" : ""}`}
-          />
-          {loading ? "Refreshing..." : "Refresh Data"}
-        </Button>
+        <div className="flex items-center mt-4 md:mt-0">
+          <Avatar className="h-12 w-12 border-2 border-white shadow-sm">
+            <AvatarFallback className="bg-blue-600 text-white">
+              {userData2?.name
+                ? userData2.name
+                    .split(" ")
+                    .map((n) => n[0])
+                    .join("")
+                    .toUpperCase()
+                : "U"}
+            </AvatarFallback>
+          </Avatar>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">

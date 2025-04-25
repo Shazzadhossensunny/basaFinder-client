@@ -324,7 +324,10 @@ export default function AdminUserManagement({
                       <TableCell className="text-right">
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" className="h-8 w-8 p-0">
+                            <Button
+                              variant="ghost"
+                              className="h-8 w-8 p-0 cursor-pointer"
+                            >
                               <span className="sr-only">Open menu</span>
                               <MoreVertical className="h-4 w-4" />
                             </Button>
@@ -408,12 +411,14 @@ export default function AdminUserManagement({
           <DialogFooter>
             <Button
               variant="outline"
+              className="cursor-pointer"
               onClick={() => setDeleteDialogOpen(false)}
             >
               Cancel
             </Button>
             <Button
               variant="destructive"
+              className="cursor-pointer"
               onClick={handleDeleteUser}
               disabled={confirmText !== selectedUser?.email}
             >
@@ -450,11 +455,13 @@ export default function AdminUserManagement({
           <DialogFooter>
             <Button
               variant="outline"
+              className="cursor-pointer"
               onClick={() => setStatusDialogOpen(false)}
             >
               Cancel
             </Button>
             <Button
+              className="cursor-pointer"
               variant={actionType === "activate" ? "default" : "secondary"}
               onClick={handleToggleStatus}
             >
@@ -509,10 +516,19 @@ export default function AdminUserManagement({
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setRoleDialogOpen(false)}>
+            <Button
+              variant="outline"
+              className="cursor-pointer"
+              onClick={() => setRoleDialogOpen(false)}
+            >
               Cancel
             </Button>
-            <Button onClick={handleRoleChange}>Update Role</Button>
+            <Button
+              className="bg-blue-600 hover:bg-blue-700 text-white cursor-pointer"
+              onClick={handleRoleChange}
+            >
+              Update Role
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

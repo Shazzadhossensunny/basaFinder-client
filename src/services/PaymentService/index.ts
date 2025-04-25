@@ -13,6 +13,7 @@ export const initiatePayment = async (requestId: string) => {
       }
     );
     revalidateTag("PAYMENTS");
+    revalidateTag("REQUESTS");
     return res.json();
   } catch (error: any) {
     return Error(error.message);
@@ -33,6 +34,7 @@ export const verifyPayment = async (verificationData: any) => {
       }
     );
     revalidateTag("PAYMENTS");
+    revalidateTag("REQUESTS");
     return res.json();
   } catch (error: any) {
     return Error(error.message);
@@ -45,7 +47,7 @@ export const getPaymentByRequestId = async (requestId: string) => {
       `${process.env.NEXT_PUBLIC_BASE_API}/payments/${requestId}`,
       {
         next: {
-          tags: ["PAYMENTS"],
+          tags: ["PAYMENTS", "REQUESTS"],
         },
         headers: {
           Authorization: (await cookies()).get("accessToken")!.value,

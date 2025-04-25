@@ -380,7 +380,10 @@ export default function AdminRentalManagement({
                       <TableCell className="text-right">
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" className="h-8 w-8 p-0">
+                            <Button
+                              variant="ghost"
+                              className="h-8 w-8 p-0 cursor-pointer"
+                            >
                               <MoreVertical className="h-4 w-4" />
                             </Button>
                           </DropdownMenuTrigger>
@@ -625,7 +628,12 @@ export default function AdminRentalManagement({
                 Edit Listing
               </Button>
             )}
-            <Button onClick={() => setViewDialogOpen(false)}>Close</Button>
+            <Button
+              className="cursor-pointer"
+              onClick={() => setViewDialogOpen(false)}
+            >
+              Close
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -647,7 +655,11 @@ export default function AdminRentalManagement({
             >
               Cancel
             </Button>
-            <Button variant="destructive" onClick={handleDeleteListing}>
+            <Button
+              className="cursor-pointer"
+              variant="destructive"
+              onClick={handleDeleteListing}
+            >
               Delete Listing
             </Button>
           </DialogFooter>
