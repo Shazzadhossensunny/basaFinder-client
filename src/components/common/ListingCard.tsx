@@ -36,7 +36,7 @@ const ListingCard = ({ listing, priority = false }: ListingCardProps) => {
       ? listing.images[0]
       : "https://psediting.websites.co.in/obaju-turquoise/img/product-placeholder.png" // Local placeholder fallback
   );
-
+  console.log(imgSrc);
   return (
     <Card className="relative h-full overflow-hidden transition-shadow duration-200 hover:shadow-md">
       <Link

@@ -10,6 +10,8 @@ import { Textarea } from "@/components/ui/textarea";
 import dynamic from "next/dynamic";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
+import contactImg from "../../../assets/contact.jpg";
+import altImg from "../../../../public/placeholder-image.svg";
 
 // Dynamic import for map (SSR disabled)
 const Map = dynamic(() => import("../../../components/common/Map"), {
@@ -68,7 +70,7 @@ export default function ContactPage() {
             </div>
             <div className="md:w-1/2 relative h-64 md:h-96 w-full rounded-lg overflow-hidden shadow-xl">
               <Image
-                src="/api/placeholder/800/600"
+                src={contactImg || altImg}
                 alt="Contact BasaFinder"
                 fill
                 className="object-cover"

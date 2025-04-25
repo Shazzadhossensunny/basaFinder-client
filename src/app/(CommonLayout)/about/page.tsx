@@ -3,6 +3,12 @@ import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import aboutImg from "../../../assets/about.jpg";
+import teamImg1 from "../../../assets/michel.jpg";
+import teamImg2 from "../../../assets/emily.jpg";
+import teamImg3 from "../../../assets/sarah.jpg";
+import teamImg4 from "../../../assets/sergio.jpg";
+import altImg from "../../../../public/placeholder-image.svg";
 
 export default function AboutPage() {
   return (
@@ -31,7 +37,7 @@ export default function AboutPage() {
             </div>
             <div className="md:w-1/2 relative h-64 md:h-96 w-full rounded-lg overflow-hidden shadow-xl">
               <Image
-                src="/api/placeholder/800/600"
+                src={aboutImg || altImg}
                 alt="About BasaFinder"
                 fill
                 className="object-cover"
@@ -83,25 +89,44 @@ export default function AboutPage() {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-3xl font-bold mb-10 text-center">Our Team</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {[1, 2, 3, 4].map((member) => (
+            {[
+              {
+                img: teamImg1,
+                name: "Michel Johnson",
+                position: "Co-Founder & CEO",
+              },
+              {
+                img: teamImg2,
+                name: "Emily Chen",
+                position: "Co-Founder & CTO",
+              },
+              {
+                img: teamImg3,
+                name: "Sarah Ahmed",
+                position: "Head of Operations",
+              },
+              {
+                img: teamImg4,
+                name: "Sergio Rahman",
+                position: "Marketing Director",
+              },
+            ].map((member, index) => (
               <div
-                key={member}
+                key={index}
                 className="bg-white rounded-lg shadow overflow-hidden hover:shadow-lg transition-shadow group cursor-pointer"
               >
                 <div className="relative h-56 w-full overflow-hidden">
                   <Image
-                    src={`/api/placeholder/300/300`}
-                    alt={`Team Member ${member}`}
+                    src={member.img || altImg}
+                    alt={`Team Member ${member.name}`}
                     fill
                     className="object-cover transition-transform duration-300 group-hover:scale-105"
                   />
                 </div>
                 <div className="p-4">
-                  <h3 className="font-semibold text-lg">
-                    Team Member {member}
-                  </h3>
+                  <h3 className="font-semibold text-lg">{member.name}</h3>
                   <p className="text-sm mb-2 bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600 font-medium">
-                    Co-Founder & Position
+                    {member.position}
                   </p>
                   <p className="text-gray-600 text-sm">
                     Passionate about creating innovative solutions for the

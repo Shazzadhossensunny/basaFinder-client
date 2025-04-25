@@ -17,7 +17,9 @@ export default async function ListingsPage({
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
         {/* Filters Sidebar */}
         <div className="lg:col-span-1">
-          <ListingFilters />
+          <Suspense>
+            <ListingFilters />
+          </Suspense>
         </div>
 
         {/* Listings Grid */}
