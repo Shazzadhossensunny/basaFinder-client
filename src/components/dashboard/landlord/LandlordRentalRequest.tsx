@@ -36,6 +36,7 @@ import {
   updateRequestStatus,
   initiateRequestPayment,
 } from "@/services/RequestService";
+import Image from "next/image";
 
 export enum PaymentStatus {
   PENDING = "pending",
@@ -264,7 +265,18 @@ const LandlordRentalRequests = () => {
                 {requests?.map((request) => (
                   <TableRow key={request._id}>
                     <TableCell className="font-medium">
-                      {request.listingId?.images[0] || "Unknown Property"}
+                      <div className="h-12 w-12 rounded-md overflow-hidden relative bg-muted">
+                        {request.listingId?.images?.[0] ? (
+                          <Image
+                            src={request.listingId.images[0]}
+                            alt="Property"
+                            fill
+                            className="object-cover"
+                          />
+                        ) : (
+                          "Unknown Property"
+                        )}
+                      </div>
                     </TableCell>
                     <TableCell>
                       {request.tenantId?.name || "Unknown Tenant"}
@@ -345,7 +357,18 @@ const LandlordRentalRequests = () => {
             <div className="space-y-4">
               <div>
                 <h3 className="font-medium">Property</h3>
-                <p>{selectedRequest.listingId?.images[0]}</p>
+                <div className="h-12 w-12 rounded-md overflow-hidden relative bg-muted">
+                  {selectedRequest.listingId?.images?.[0] ? (
+                    <Image
+                      src={selectedRequest.listingId.images[0]}
+                      alt="Property"
+                      fill
+                      className="object-cover"
+                    />
+                  ) : (
+                    "Unknown Property"
+                  )}
+                </div>
                 <p className="text-sm text-muted-foreground">
                   {selectedRequest.listingId?.location} - $
                   {selectedRequest.listingId?.rent}/month

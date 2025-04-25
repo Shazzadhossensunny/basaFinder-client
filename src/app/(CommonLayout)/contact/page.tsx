@@ -10,8 +10,8 @@ import { Textarea } from "@/components/ui/textarea";
 import dynamic from "next/dynamic";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import contactImg from "../../../assets/contact.jpg";
-import altImg from "../../../../public/placeholder-image.svg";
+import contactImg from "/public/assets/contact.jpg";
+import altImg from "/public/placeholder-image.svg";
 
 // Dynamic import for map (SSR disabled)
 const Map = dynamic(() => import("../../../components/common/Map"), {

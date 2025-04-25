@@ -3,12 +3,12 @@ import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import aboutImg from "../../../assets/about.jpg";
-import teamImg1 from "../../../assets/michel.jpg";
-import teamImg2 from "../../../assets/emily.jpg";
-import teamImg3 from "../../../assets/sarah.jpg";
-import teamImg4 from "../../../assets/sergio.jpg";
-import altImg from "../../../../public/placeholder-image.svg";
+import aboutImg from "/public/assets/about.jpg";
+import teamImg1 from "/public/assets/michel.jpg";
+import teamImg2 from "/public/assets/emily.jpg";
+import teamImg3 from "/public/assets/sarah.jpg";
+import teamImg4 from "/public/assets/sergio.jpg";
+import altImg from "/public/placeholder-image.svg";
 
 export default function AboutPage() {
   return (
