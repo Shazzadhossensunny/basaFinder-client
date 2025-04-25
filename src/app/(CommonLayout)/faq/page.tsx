@@ -114,34 +114,24 @@ export default function FAQsPage() {
       {/* Hero Section */}
       <div className="bg-gradient-to-r from-blue-600 to-indigo-700 text-white py-16">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col md:flex-row items-center gap-8">
-            <div className="md:w-1/2">
-              <h1 className="text-4xl md:text-5xl font-bold mb-4">
-                Frequently Asked Questions
-              </h1>
-              <p className="text-lg text-blue-100 mb-6">
-                Find answers to common questions about using BasaFinder, whether
-                you're a tenant looking for your next home or a property owner
-                listing your space.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4">
-                <Link href="/contact">
-                  <Button
-                    size="lg"
-                    className="bg-white text-blue-700 hover:bg-blue-50 cursor-pointer"
-                  >
-                    Contact Support
-                  </Button>
-                </Link>
-              </div>
-            </div>
-            <div className="md:w-1/2 relative h-64 md:h-80 w-full rounded-lg overflow-hidden shadow-xl">
-              <Image
-                src="/api/placeholder/800/600"
-                alt="BasaFinder Support"
-                fill
-                className="object-cover"
-              />
+          <div className="max-w-4xl mx-auto text-center">
+            <h1 className="text-4xl md:text-5xl font-bold mb-4">
+              Frequently Asked Questions
+            </h1>
+            <p className="text-lg text-blue-100 mb-6">
+              Find answers to common questions about using BasaFinder, whether
+              you're a tenant looking for your next home or a property owner
+              listing your space.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4">
+              <Link href="/contact">
+                <Button
+                  size="lg"
+                  className="bg-white text-blue-700 hover:bg-blue-50 cursor-pointer"
+                >
+                  Contact Support
+                </Button>
+              </Link>
             </div>
           </div>
         </div>
