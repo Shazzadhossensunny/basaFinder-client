@@ -1,7 +1,6 @@
 import FeaturedListings from "@/components/home/FeaturedListings";
 import Hero from "@/components/home/Hero";
 import InlineSearchResults from "@/components/home/SearchBar";
-import SearchBar from "@/components/home/SearchBar";
 import { Button } from "@/components/ui/button";
 import { getAllListings } from "@/services/ListingService";
 import { Building, Phone, Star, Users } from "lucide-react";
