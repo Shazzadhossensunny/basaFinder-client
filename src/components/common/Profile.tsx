@@ -151,7 +151,7 @@ export default function Profile() {
   if (contextLoading || loading) {
     return (
       <div className="flex items-center justify-center h-96">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
         <span className="ml-2">Loading profile...</span>
       </div>
     );

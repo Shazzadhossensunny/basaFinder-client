@@ -116,7 +116,7 @@ export default function LandlordListings() {
   if (isLoading) {
     return (
       <div className="h-screen flex items-center justify-center">
-        <Loader2 className="animate-spin h-10 w-10 text-purple-600" />
+        <Loader2 className="animate-spin h-10 w-10 text-blue-600" />
       </div>
     );
   }
@@ -136,7 +136,7 @@ export default function LandlordListings() {
 
         {listingsLoading ? (
           <div className="flex justify-center py-12">
-            <Loader2 className="animate-spin h-8 w-8 text-purple-600" />
+            <Loader2 className="animate-spin h-8 w-8 text-blue-600" />
           </div>
         ) : listings.length === 0 ? (
           <Card className="bg-muted/50">

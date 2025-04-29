@@ -272,7 +272,7 @@ const InlineSearchResults = ({
             {isLoading ? (
               <div className="p-8">
                 <div className="flex justify-center items-center">
-                  <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
+                  <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
                   <span className="ml-2 text-gray-600">
                     Searching for your perfect home...
                   </span>

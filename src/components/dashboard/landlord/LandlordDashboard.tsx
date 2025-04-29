@@ -118,7 +118,7 @@ export default function LandlordDashboard() {
   if (isLoading || dashboardLoading) {
     return (
       <div className="h-screen flex items-center justify-center">
-        <Loader2 className="animate-spin h-10 w-10 text-purple-600" />
+        <Loader2 className="animate-spin h-10 w-10 text-blue-600" />
       </div>
     );
   }
