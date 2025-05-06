@@ -40,6 +40,7 @@ import {
   initiateRequestPayment,
 } from "@/services/RequestService";
 import Link from "next/link";
+import TablePagination from "@/components/common/Pagination";
 
 export type PaymentStatus = "pending" | "paid" | "failed";
 
@@ -314,7 +315,7 @@ const TenantRentalRequests = () => {
             You haven't submitted any rental requests yet.
           </div>
         ) : (
-          <div className="overflow-x-auto">
+          <div className="overflow-x-auto rounded-md border">
             <Table className="min-w-full">
               <TableHeader>
                 <TableRow>
@@ -397,6 +398,7 @@ const TenantRentalRequests = () => {
             </Table>
           </div>
         )}
+        <TablePagination totalPage={1} />
       </CardContent>
 
       {/* Request Details Dialog */}

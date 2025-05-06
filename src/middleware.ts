@@ -1,6 +1,17 @@
 import { getCurrentUser } from "@/services/AuthService";
 import { NextRequest, NextResponse } from "next/server";
 
+export const protectedRoutes = [
+  "/dashboard",
+  "/dashboard/:path*",
+  "/listings/create",
+  "/profile",
+  "/change-password",
+  "/admin/:path*",
+  "/landlord/:path*",
+  "/tenant/:path*",
+];
+
 type Role = keyof typeof roleBasedPrivateRoutes;
 
 const publicRoutes = [
@@ -27,23 +38,24 @@ const roleBasedPrivateRoutes = {
 export const middleware = async (request: NextRequest) => {
   const { pathname } = request.nextUrl;
 
-  // ✅ Public routes (excluding listing details)
+  // ✅ Public routes
   const isPublicRoute =
     publicRoutes.includes(pathname) ||
     pathname.startsWith("/_next") ||
     pathname.startsWith("/static");
 
-  if (isPublicRoute) {
+  // Make listing detail pages public (matches /listings/123 pattern but not /listings/create)
+  const isListingDetailPage =
+    pathname.startsWith("/listings/") && pathname !== "/listings/create";
+
+  // Allow public access to listing detail pages
+  if (isPublicRoute || isListingDetailPage) {
     return NextResponse.next();
   }
 
   const userInfo = await getCurrentUser();
 
-  // Check if this is a listing detail page (matches /listings/123 pattern)
-  const isListingDetailPage =
-    pathname.startsWith("/listings/") && pathname !== "/listings/create";
-
-  // ❌ Not logged in trying to access protected routes (including listing details)
+  // ❌ Not logged in trying to access protected routes
   const isCommonPrivateRoute = commonPrivateRoutes.some((route) =>
     pathname.startsWith(route)
   );
@@ -52,10 +64,7 @@ export const middleware = async (request: NextRequest) => {
     (patterns) => patterns.some((pattern) => pattern.test(pathname))
   );
 
-  if (
-    !userInfo &&
-    (isCommonPrivateRoute || isRoleBasedRoute || isListingDetailPage)
-  ) {
+  if (!userInfo && (isCommonPrivateRoute || isRoleBasedRoute)) {
     return NextResponse.redirect(
       new URL(`/login?redirectPath=${pathname}`, request.url)
     );
@@ -63,11 +72,6 @@ export const middleware = async (request: NextRequest) => {
 
   // ✅ Logged in user — check role-based access
   if (userInfo) {
-    // For listing details, any logged-in user can access
-    if (isListingDetailPage) {
-      return NextResponse.next();
-    }
-
     const role = userInfo.role as Role;
     const allowedPatterns = roleBasedPrivateRoutes[role] || [];
 

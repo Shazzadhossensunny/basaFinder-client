@@ -57,6 +57,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { toast } from "sonner";
+
+import TablePagination from "@/components/common/Pagination";
 import { useUser } from "@/context/UserContext";
 
 interface User {
@@ -385,6 +387,8 @@ export default function AdminUserManagement({
               </TableBody>
             </Table>
           </div>
+          {/* need implement later */}
+          <TablePagination totalPage={1} />
         </CardContent>
       </Card>
 

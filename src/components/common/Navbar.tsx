@@ -203,7 +203,7 @@ const Navbar = () => {
                   </Button>
                 </Link>
                 <Link href="/register">
-                  <Button className="w-full w-full bg-blue-600 hover:bg-blue-700 text-white">
+                  <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white mt-2">
                     Register
                   </Button>
                 </Link>

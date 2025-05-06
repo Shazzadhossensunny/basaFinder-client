@@ -37,6 +37,7 @@ import {
   initiateRequestPayment,
 } from "@/services/RequestService";
 import Image from "next/image";
+import TablePagination from "@/components/common/Pagination";
 
 export enum PaymentStatus {
   PENDING = "pending",
@@ -250,7 +251,7 @@ const LandlordRentalRequests = () => {
             No rental requests found.
           </div>
         ) : (
-          <div className="overflow-x-auto">
+          <div className="overflow-x-auto rounded-md border">
             <Table>
               <TableHeader>
                 <TableRow>
@@ -345,6 +346,7 @@ const LandlordRentalRequests = () => {
             </Table>
           </div>
         )}
+        <TablePagination totalPage={1} />
       </CardContent>
 
       {/* Request Details Dialog */}

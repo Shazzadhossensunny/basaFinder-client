@@ -14,6 +14,8 @@ import {
   Lock,
   UserCog,
   LogOut,
+  Menu as MenuIcon,
+  X as CloseIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useRouter, usePathname } from "next/navigation";
@@ -313,8 +315,13 @@ const Sidebar: React.FC<SidebarProps> = ({
               size="sm"
               className="lg:hidden cursor-pointer"
               onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+              aria-label={isSidebarOpen ? "Close sidebar" : "Open sidebar"}
             >
-              {isSidebarOpen ? "Close" : "Menu"}
+              {isSidebarOpen ? (
+                <CloseIcon className="h-5 w-5" />
+              ) : (
+                <MenuIcon className="h-5 w-5" />
+              )}
             </Button>
           </div>
         </header>

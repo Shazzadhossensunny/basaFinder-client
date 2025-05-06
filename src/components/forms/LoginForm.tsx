@@ -38,6 +38,25 @@ const formSchema = z.object({
 
 type FormValues = z.infer<typeof formSchema>;
 
+// Define role type to ensure type safety
+type Role = "admin" | "tenant" | "landlord";
+
+// Predefined credentials for different roles
+const roleCredentials: Record<Role, { email: string; password: string }> = {
+  admin: {
+    email: "sunny@gmail.com",
+    password: "123456",
+  },
+  tenant: {
+    email: "rohim@gmail.com",
+    password: "123456",
+  },
+  landlord: {
+    email: "abul@gmail.com",
+    password: "123456",
+  },
+};
+
 export function LoginForm() {
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -62,17 +81,6 @@ export function LoginForm() {
       setIsLoading(true);
       if (result?.success) {
         toast.success(result?.message);
-        // Redirect based on user role
-        // const userRole = user?.role;
-        // if (userRole === "admin") {
-        //   router.push("/admin");
-        // } else if (userRole === "landlord") {
-        //   router.push("/landlord");
-        // } else if (userRole === "tenant") {
-        //   router.push("/tenant");
-        // } else {
-        //   router.push("/");
-        // }
         if (redirect) {
           router.push(redirect);
         } else {
@@ -87,6 +95,13 @@ export function LoginForm() {
     }
   };
 
+  // Function to fill form with role credentials
+  const fillCredentials = (role: Role) => {
+    const credentials = roleCredentials[role];
+    form.setValue("email", credentials.email);
+    form.setValue("password", credentials.password);
+  };
+
   return (
     <Card className="w-full max-w-md mx-auto">
       <CardHeader>
@@ -98,6 +113,37 @@ export function LoginForm() {
         </CardDescription>
       </CardHeader>
       <CardContent>
+        {/* Quick Login Buttons */}
+        <div className="mb-6">
+          <p className="text-sm text-gray-500 mb-2 text-center">Quick Login:</p>
+          <div className="flex space-x-2 justify-center">
+            <Button
+              type="button"
+              variant="outline"
+              className="text-xs bg-red-50 hover:bg-red-100 text-red-700 border-red-200"
+              onClick={() => fillCredentials("admin")}
+            >
+              Admin
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              className="text-xs bg-blue-50 hover:bg-blue-100 text-blue-700 border-blue-200"
+              onClick={() => fillCredentials("tenant")}
+            >
+              Tenant
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              className="text-xs bg-green-50 hover:bg-green-100 text-green-700 border-green-200"
+              onClick={() => fillCredentials("landlord")}
+            >
+              Landlord
+            </Button>
+          </div>
+        </div>
+
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             <FormField

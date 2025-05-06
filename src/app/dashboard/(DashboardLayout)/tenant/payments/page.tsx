@@ -42,6 +42,7 @@ import { Input } from "@/components/ui/input";
 import { Search, Filter, MoreHorizontal, Calendar } from "lucide-react";
 import { format } from "date-fns";
 import { getAllPaymentsByUser } from "@/services/PaymentService";
+import TablePagination from "@/components/common/Pagination";
 
 // Type definitions based on the provided data
 interface PaymentInfo {
@@ -280,6 +281,7 @@ export default function PaymentHistoryPage() {
               </Table>
             </div>
           )}
+          <TablePagination totalPage={1} />
         </CardContent>
       </Card>
 

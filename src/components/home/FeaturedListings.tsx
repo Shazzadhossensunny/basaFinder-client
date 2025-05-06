@@ -57,7 +57,7 @@ const FeaturedListings = ({ featuresListingsData }: any) => {
               Explore our handpicked selection of premium rental properties
             </p>
           </div>
-          <div className="hidden md:flex gap-2">
+          {/* <div className="hidden md:flex gap-2">
             <Button
               variant="outline"
               size="icon"
@@ -74,11 +74,11 @@ const FeaturedListings = ({ featuresListingsData }: any) => {
             >
               <ChevronRight className="h-4 w-4" />
             </Button>
-          </div>
+          </div> */}
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {listings?.map((listing: any) => (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          {listings.slice(0, 8)?.map((listing: any) => (
             <ListingCard key={listing._id} listing={listing} />
           ))}
         </div>
@@ -87,7 +87,7 @@ const FeaturedListings = ({ featuresListingsData }: any) => {
           <Link href="/listings">
             <Button
               size="lg"
-              className="px-8 bg-blue-600 hover:bg-blue-700 text-white"
+              className="px-8 bg-blue-600 hover:bg-blue-700 text-white cursor-pointer"
             >
               View All Properties
             </Button>
@@ -108,7 +108,7 @@ const LoadingSkeleton = () => {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {Array(6)
+          {Array(8)
             .fill(0)
             .map((_, i) => (
               <div

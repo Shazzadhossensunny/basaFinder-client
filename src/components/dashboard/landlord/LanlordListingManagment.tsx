@@ -34,6 +34,7 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { useUser } from "@/context/UserContext";
 import { IListing } from "@/types/listing.type";
+import TablePagination from "@/components/common/Pagination";
 
 export default function LandlordListings() {
   const { user, isLoading, setIsLoading, setUser } = useUser();
@@ -160,7 +161,7 @@ export default function LandlordListings() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="overflow-x-auto">
+                <div className="overflow-x-auto rounded-md border">
                   <Table>
                     <TableHeader>
                       <TableRow>
@@ -248,6 +249,7 @@ export default function LandlordListings() {
                     </TableBody>
                   </Table>
                 </div>
+                <TablePagination totalPage={1} />
               </CardContent>
             </Card>
           </div>
